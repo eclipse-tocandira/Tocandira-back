@@ -8,4 +8,5 @@ COPY ./src /code/src
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN mkdir -p /code/db
 
-ENTRYPOINT ["uvicorn", "src.main:app"]
+EXPOSE 8000
+ENTRYPOINT ["uvicorn", "src.main:app", "--port", "8000" ]
