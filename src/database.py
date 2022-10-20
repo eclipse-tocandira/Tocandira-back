@@ -38,3 +38,17 @@ def SessionManager():
     finally:
         db.close()
 # --------------------
+
+# --------------------
+def get_db():
+    ''' Database state in the dependency function. This is a
+    method needed by FastAPI that is used along with `Depends`
+    class in routes.\n
+    return `db` (SessionLocal): Database session.\n
+    '''
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+# --------------------

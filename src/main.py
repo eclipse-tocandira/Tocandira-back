@@ -4,24 +4,21 @@ of the configuration tool.\n
 Copyright (c) 2017 Aimirim STI.\n
 ## Dependencies are:
 * fastapi
-* sqlalchemy
 '''
 
 # Import system libs
 from typing import List
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
 # Import custom libs
 from .env import Enviroment as Env
 from . import models, schemas
-from .crud import Tuser, Tmessage
-from .database import SessionLocal, SessionManager, engine
+from .crud import Tuser
+from .database import SessionManager, engine
+from .user_management import routes as usr_routes
 
 #######################################
-
-default_route = f"/{Env.API_NAME}/{Env.API_VERSION}"
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -41,73 +38,25 @@ with SessionManager() as db:
         admin_usr = schemas.UserCreate(name='admin',password='admin')
         Tuser.create(db,admin_usr)
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+root = f"/{Env.API_NAME}/{Env.API_VERSION}"
 
+# Application Routes 
+app.add_api_route(root+"/user/",
+    methods=["POST"], response_model=schemas.User,
+    endpoint=usr_routes.create_user )
 
-@app.post(default_route+"/users/", response_model=schemas.User)
-def create_user(new_user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return Tuser.create(db=db, new_user=new_user)
+app.add_api_route(root+"/users/",
+    methods=["GET"], response_model=List[schemas.User],
+    endpoint=usr_routes.read_user_range )
 
+app.add_api_route(root+"/user_name/{user_name}",
+    methods=["GET"], response_model=schemas.User,
+    endpoint=usr_routes.read_user_name )
 
-@app.get(default_route+"/users/", response_model=List[schemas.User])
-def read_users(ini: int = 0, end: int = 100,
-               db: Session = Depends(get_db)):
-    users = Tuser.get_by_range(db, ini=ini, end=end)
-    return users
+app.add_api_route(root+"/user_id/{user_id}",
+    methods=["GET"], response_model=schemas.User,
+    endpoint=usr_routes.read_user_id )
 
-
-@app.get(default_route+"/search_name/{user_name}", response_model=schemas.User)
-def read_user_name(db: Session = Depends(get_db), user_name=str):
-    name_user = Tuser.get_by_name(db, name=user_name)
-    if name_user is None:
-        raise HTTPException(status_code=404, detail="Name not found")
-    return name_user
-
-
-@app.get(default_route+"/search_id/{user_id}", response_model=schemas.User)
-def read_user_id(db: Session = Depends(get_db), user_id=int):
-    id_user = Tuser.get_by_id(db, user_id=user_id)
-    if id_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return id_user
-
-
-@app.post(default_route+"/messages/", response_model=schemas.Message)
-def create_message(new_message: schemas.MessageCreate,
-                   db: Session = Depends(get_db)):
-    return Tmessage.create(db=db, new_message=new_message)
-
-
-@app.get(default_route+"/messages/", response_model=List[schemas.Message])
-def read_messages(ini: int = 0, end: int = 100,
-                  db: Session = Depends(get_db)):
-    messages = Tmessage.get_by_range(db, ini=ini, end=end)
-    return messages
-
-
-@app.get(default_route+"/search_messages/{message_message}", response_model=schemas.Message)
-def read_user_massage(db: Session = Depends(get_db),
-                      message_message=str):
-    db_messages = Tmessage.get_by_message(db, message=message_message)
-    if db_messages is None:
-        raise HTTPException(status_code=404, detail="Message not found")
-    return db_messages
-
-
-@app.get(default_route+"/search_content/{message_content}", response_model=schemas.Message)
-def read_user_content(db: Session = Depends(get_db),
-                      message_content=str):
-    db_content = Tmessage.get_by_content(db, content=message_content)
-    if db_content is None:
-        raise HTTPException(status_code=404, detail="Content not found")
-    return db_content
-
-@app.get(default_route)
-async def root():
-    return {"Message": "Hello World"} 
+app.add_api_route(root,
+    methods=["GET"], response_model=None,
+    endpoint=usr_routes.read_helloworld )
