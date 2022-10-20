@@ -54,6 +54,16 @@ class Tuser:
 
     # --------------------
     @staticmethod
+    def get_all(db:Session):
+        ''' Query the database to get all user IDs.\n
+        `db` (Session): Database session instance.\n
+        return (Query): All result of the query.\n
+        '''
+        return db.query(models.User).all()
+    # --------------------
+
+    # --------------------
+    @staticmethod
     def create(db: Session, new_user: schemas.UserCreate):
         ''' Create a new user in the database.\n
         `db` (Session): Database session instance.\n

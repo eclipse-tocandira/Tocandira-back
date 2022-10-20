@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from .env import Enviroment as Env
 from . import models, schemas
 from .crud import Tuser, Tmessage
-from .database import SessionLocal, engine
+from .database import SessionLocal, SessionManager, engine
 
 #######################################
 
@@ -34,6 +34,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Check for users and create a default one if it is empty
+with SessionManager() as db:
+    if (len(Tuser.get_all(db))==0):
+        admin_usr = schemas.UserCreate(name='admin',password='admin')
+        Tuser.create(db,admin_usr)
 
 # Dependency
 def get_db():
