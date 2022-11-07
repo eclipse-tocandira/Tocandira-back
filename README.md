@@ -22,7 +22,7 @@ With:
 ## Running the image
 Once the image is in docker, to run this frontend use:
 ```
-$ docker run -p 80:80 backend:<tag>
+$ docker run -p 8000:8000 backend:<tag> --host 0.0.0.0
 ```
 With:
 - `<tag>`: as the image version, i.e. `0.1.0`
