@@ -8,15 +8,18 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import custom libs
 from .env import Enviroment as Env
-from . import models, schemas
+from . import models
 from .crud import Tuser
 from .database import SessionManager, engine
-from .user_management import routes as usr_routes
+# from .user_create import routes as usr_routes
+from .user_authentication import schemas as auth_schemas
+from .user_authentication import routes as auth_routes
+
 
 #######################################
 
@@ -35,28 +38,13 @@ app.add_middleware(
 # Check for users and create a default one if it is empty
 with SessionManager() as db:
     if (len(Tuser.get_all(db))==0):
-        admin_usr = schemas.UserCreate(name='admin',password='admin')
+        admin_usr = auth_schemas.UserCreate(name='admin', password='admin')
         Tuser.create(db,admin_usr)
 
 root = f"/{Env.API_NAME}/{Env.API_VERSION}"
 
 # Application Routes 
-app.add_api_route(root+"/user/",
-    methods=["POST"], response_model=schemas.User,
-    endpoint=usr_routes.create_user )
+app.add_api_route(root+"/login",
+    methods=["GET"], response_model=auth_schemas.LoginSucesso,
+    endpoint=auth_routes.authentication)
 
-app.add_api_route(root+"/users/",
-    methods=["GET"], response_model=List[schemas.User],
-    endpoint=usr_routes.read_user_range )
-
-app.add_api_route(root+"/user_name/{user_name}",
-    methods=["GET"], response_model=schemas.User,
-    endpoint=usr_routes.read_user_name )
-
-app.add_api_route(root+"/user_id/{user_id}",
-    methods=["GET"], response_model=schemas.User,
-    endpoint=usr_routes.read_user_id )
-
-app.add_api_route(root,
-    methods=["GET"], response_model=None,
-    endpoint=usr_routes.read_helloworld )

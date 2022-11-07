@@ -7,7 +7,7 @@ Copyright (c) 2017 Aimirim STI.\n
 '''
 
 # Import system libs
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 
 # Import custom libs
 from .database import Base
@@ -20,3 +20,4 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     password = Column(String)
+    is_admin = Column(Boolean, default=True)
