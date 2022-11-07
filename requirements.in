@@ -3,3 +3,5 @@ SQLAlchemy
 uvicorn
 typing-extensions
 pydantic
+passlib[bcrypt]
+python-jose[cryptography]

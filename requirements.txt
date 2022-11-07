@@ -6,8 +6,16 @@
 #
 anyio==3.6.1
     # via starlette
+bcrypt==4.0.1
+    # via passlib
+cffi==1.15.1
+    # via cryptography
 click==8.1.3
     # via uvicorn
+cryptography==38.0.3
+    # via python-jose
+ecdsa==0.18.0
+    # via python-jose
 fastapi==0.85.0
     # via -r requirements.in
 greenlet==1.1.3.post0
@@ -16,10 +24,24 @@ h11==0.14.0
     # via uvicorn
 idna==3.4
     # via anyio
+passlib[bcrypt]==1.7.4
+    # via -r requirements.in
+pyasn1==0.4.8
+    # via
+    #   python-jose
+    #   rsa
+pycparser==2.21
+    # via cffi
 pydantic==1.10.2
     # via
     #   -r requirements.in
     #   fastapi
+python-jose[cryptography]==3.3.0
+    # via -r requirements.in
+rsa==4.9
+    # via python-jose
+six==1.16.0
+    # via ecdsa
 sniffio==1.3.0
     # via anyio
 sqlalchemy==1.4.41
