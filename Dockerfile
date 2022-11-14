@@ -1,6 +1,7 @@
-FROM python:3.9
+FROM python:3.9.15-alpine3.16
 
 WORKDIR /code
+RUN apk add --no-cache gcc g++ musl-dev
 
 COPY requirements.txt /code/requirements.txt
 COPY ./src /code/src
