@@ -10,22 +10,23 @@ Copyright (c) 2017 Aimirim STI.\n
 from typing import List
 from fastapi import FastAPI, Depends, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 # Import custom libs
+from . import database
 from .env import Enviroment as Env
-from . import models
 from .crud import Tuser
-from .database import SessionManager, engine, get_db
-# from .user_create import routes as usr_routes
+from .database import SessionManager, engine
 from .user_authentication import schemas as auth_schemas
 from .user_authentication import routes as auth_routes
-from fastapi.security import OAuth2PasswordBearer
+from .plc_data import schemas as plc_schemas
+from .plc_data import routes as plc_routes
 
 
 #######################################
 
-models.Base.metadata.create_all(bind=engine)
+database.Base.metadata.create_all(bind=engine)
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl='access_token')
 
@@ -55,3 +56,11 @@ app.add_api_route(root+"/login",
 app.add_api_route(root+"/hello",
     methods=["POST"], response_model=str,
     endpoint=auth_routes.hello_word)
+
+app.add_api_route(root+"/protocol_defaults",
+    methods=["GET"], response_model=plc_schemas.simpleList,
+    endpoint=plc_routes.get_protocol_defaults)
+
+app.add_api_route(root+"/ds_defaults/{prot_name}",
+    methods=["GET"], response_model=plc_schemas.dataSourceInfo,
+    endpoint=plc_routes.get_ds_defaults)
