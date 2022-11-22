@@ -6,6 +6,7 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 import os
+import json
 
 #######################################
 
@@ -24,3 +25,13 @@ class Enviroment:
     DATABASE_URL = os.getenv('CONF_DATABASE_URL', default='sqlite:///db/sql_app.db')
     '''`DATABASE_URL` (str): The SQL URL to find the `sql_app.db` file.
     Default is `"sqlite:///db/sql_app.db"`'''
+
+    DEFAULT_FILE = os.getenv('CONF_DEFAULT_FILE' ,default='config/defaults.json')
+    '''`DEFAULT_FILE` (str): Path to a json file with placeholders for FrontEnd. 
+    Default is `"../config/defaults.json"`'''
+
+    DEFAULTS = json.load(open(DEFAULT_FILE,'r'))
+    '''`DEFAULTS` (json): Loaded Defaults from DEFAULT_FILE'''
+
+    CYCLETIME = os.getenv('CONF_CYCLETIME', default='5000')
+    '''`CYCLETIME` (int): Gateway Read execution time'''
