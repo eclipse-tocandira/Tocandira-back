@@ -1,0 +1,56 @@
+{
+    "Protocol":{
+        "Siemens":{
+            "name":{"value":"PLC name"},
+            "plc_ip":{"value":"0.0.0.0"},
+            "plc_port":{"value":"102"},
+            "timeout":{"value":"2000"},
+            "protocol":{
+                "rack":{"value":"0"},
+                "slot":{"value":"1"},
+                "plc":{"value":"S7-300","valid":["S7-200","S7-300","S7-400","S7-1200","S7-1500"]}
+            }
+        },
+        "Rockwell":{
+            "name":{"value":"PLC name"},
+            "plc_ip":{"value":"0.0.0.0"},
+            "plc_port":{"value":"44818"},
+            "timeout":{"value":"2000"},
+            "protocol":{
+                "path":{"value":"1,16,A,11"},
+                "slot":{"value":"0"},
+                "connection":{"value":"Ethernet","valid":["Ethernet","DH+"]}
+            }
+        },
+        "Modbus":{
+            "name":{"value":"PLC name"},
+            "plc_ip":{"value":"0.0.0.0"},
+            "plc_port":{"value":"502"},
+            "timeout":{"value":"2000"},
+            "protocol":{
+                "slave_id":{"value":"0"}
+            }
+        }
+    },
+    "Data":{
+        "Siemens":{
+            "name":{"value":"Variable name"},
+            "description":{"value":"Variable description"},
+            "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
+            "address":{"value":"DB100.DBD818"}
+        },
+        "Rockwell":{
+            "name":{"value":"Variable name"},
+            "description":{"value":"Variable description"},
+            "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
+            "tag_name":{"value":"FIX_ANALOG[32]"}
+        },
+        "Modbus":{
+            "name":{"value":"Variable name"},
+            "description":{"value":"Variable description"},
+            "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
+            "func_code":{"value":"4","valid":["","","",""]},
+            "address":{"value":"32004"}
+        }
+    }
+}
