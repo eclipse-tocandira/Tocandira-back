@@ -8,22 +8,26 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 from typing import List
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 # Import custom libs
 from .env import Enviroment as Env
 from . import models
 from .crud import Tuser
-from .database import SessionManager, engine
+from .database import SessionManager, engine, get_db
 # from .user_create import routes as usr_routes
 from .user_authentication import schemas as auth_schemas
 from .user_authentication import routes as auth_routes
+from fastapi.security import OAuth2PasswordBearer
 
 
 #######################################
 
 models.Base.metadata.create_all(bind=engine)
+
+oauth2_schema = OAuth2PasswordBearer(tokenUrl='access_token')
 
 app = FastAPI()
 
@@ -45,6 +49,5 @@ root = f"/{Env.API_NAME}/{Env.API_VERSION}"
 
 # Application Routes 
 app.add_api_route(root+"/login",
-    methods=["GET"], response_model=auth_schemas.LoginSucesso,
+    methods=["POST"], response_model=auth_schemas.LoginSucesso,
     endpoint=auth_routes.authentication)
-

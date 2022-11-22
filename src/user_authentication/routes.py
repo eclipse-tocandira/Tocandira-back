@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Union
 from fastapi.security import OAuth2PasswordBearer
+from .schemas import LoginData
 
 
 # Import custom libs
@@ -34,14 +35,14 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='access_token')
 #       user shoud pass, but it is handled internaly by FastAPI.
 
 # --------------------
-def authentication(username:str, password:str, db:Session=Depends(get_db)):
+def authentication(user: LoginData, db:Session=Depends(get_db)):
     ''' Checks if the entered user is validated. \n
     `db` (Session): Database session instance. \n
     `username` (str): Username entered. \n
     `password` (str): Password entered. \n
     return `usr` (JSONResponse): return access token. \n
     '''
-    usr = Tuser.authenticate_user(db, username, password)
+    usr = Tuser.authenticate_user(db, user.username, user.password)
     if not usr:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,7 +94,7 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     return `` (): \n
     '''
     exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail='Token inválido')
+        status_code=status.HTTP_401_UNAUTHORIZED, detail='Usuario Não Logado')
     try:
         name = token_validation(token)
     except JWTError:
@@ -107,7 +108,5 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     if not usr:
         raise exception
 
-    return 
+    return usr
 # --------------------
-
-                        
