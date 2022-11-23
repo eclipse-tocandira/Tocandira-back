@@ -10,9 +10,6 @@ Copyright (c) 2017 Aimirim STI.\n
 from pydantic import BaseModel
 
 #######################################
-class Mensagem(BaseModel):
-    mensagem: str
-
 
 class LoginData(BaseModel):
     username: str

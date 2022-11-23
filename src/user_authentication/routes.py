@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Union
 from fastapi.security import OAuth2PasswordBearer
-from .schemas import LoginData
+from .schemas import LoginData, LoginSucesso
 
 
 # Import custom libs
@@ -103,10 +103,24 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     if not name:
         raise exception
 
-    usr = Tuser(session).get_by_name(name)
+    usr = Tuser.get_by_name(session, name = name)
 
     if not usr:
         raise exception
 
-    return usr
+    return usr.name
+# --------------------
+
+# --------------------
+def hello_word(acesse: LoginSucesso,
+               session :Session=Depends(get_db)):
+    ''' Função para retornar um "Hello World \n
+    `acesse` (LoginSucesso): Parametros de acesso\n
+    return `messagem` (str): messagem para ser vista\n
+    '''
+    user_login = obter_usuario_logado(acesse.access_token, session)
+    if user_login :
+        return "Hello Word"
+    else:
+        return "Usuario não logado"
 # --------------------

@@ -51,3 +51,7 @@ root = f"/{Env.API_NAME}/{Env.API_VERSION}"
 app.add_api_route(root+"/login",
     methods=["POST"], response_model=auth_schemas.LoginSucesso,
     endpoint=auth_routes.authentication)
+
+app.add_api_route(root+"/hello",
+    methods=["POST"], response_model=str,
+    endpoint=auth_routes.hello_word)
