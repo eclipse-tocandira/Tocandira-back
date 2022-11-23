@@ -12,8 +12,9 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 # Import custom libs
+from . import schemas
+from .. import models
 from ..database import get_db
-from ..env import Enviroment
 from ..crud import Tplcdata
 
 #######################################
@@ -39,7 +40,7 @@ def get_protocol_defaults():
 # --------------------
 
 # --------------------
-def get_ds_defaults(prot_name:str):
+def get_datasource_defaults(prot_name:str):
     ''' Get the list of DataSource information to use as placeholders.\n
     `prot_name` (str): Protocol name to ger defauts from.\n
     return `val_dict` (JSONResponse): A `schemas.dataSourceInfo` object
@@ -52,4 +53,20 @@ def get_ds_defaults(prot_name:str):
         raise HTTPException(status_code=404, detail=f"Error searching for available {m_name}.")
 
     return(val_dict)
+# --------------------
+
+# --------------------
+def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_db)):
+    ''' Create an entry at in database to save this DataSource.\n
+    `datasource` (schemas.dataSourceInfo): DataSource informations.\n
+    return `created` (JSONResponse): A boolean automatically parser into
+    a HTTP_OK response.\n
+    '''
+    val_ds = Tplcdata.create_datasource(db,datasource)
+
+    if (val_ds==None):
+        m_name = f"Data Source '{datasource.name}'"
+        raise HTTPException(status_code=404, detail=f"Error creating {m_name}.")
+
+    return(val_ds)
 # --------------------

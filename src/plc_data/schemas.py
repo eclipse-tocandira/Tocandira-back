@@ -15,6 +15,14 @@ class simpleList(BaseModel):
     defaultValue: str
     menuItems: list
 
+class simpleConfirmation(BaseModel):
+    id: int
+    name: str
+
+class protocolInfo(BaseModel):
+    name: str
+    data: dict
+
 class dataSourceInfo(BaseModel):
     name: str
     plc_ip: str
@@ -22,4 +30,10 @@ class dataSourceInfo(BaseModel):
     cycletime: int
     timeout: int
     status: bool
-    protocol: dict
+    protocol: protocolInfo
+
+class protocol(protocolInfo):
+    id: int
+class dataSource(dataSourceInfo):
+    id: int
+    protocol: protocol

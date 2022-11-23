@@ -50,7 +50,7 @@ class DataSource(Base):
     plc_port = Column(Integer)
     cycletime = Column(Integer)
     timeout = Column(Integer)
-    status = Column(Boolean)
+    status = Column(Boolean, default=False)
     # Other tables
     protocol = relationship("Protocol", back_populates="datasource", uselist=False)# 1 to 1
     datapoints = relationship("DataPoint", back_populates="datasource")# 1 to N
@@ -136,4 +136,18 @@ class DataModbus(DataPoint):
     @declared_attr
     def address(cls):
         return DataPoint.__table__.c.get('address', Column(Integer))
+# --------------------
+
+# --------------------
+IMPLEMENTED_DS = {
+    'Siemens':  ProtSiemens,
+    'Rockwell': ProtRockwell,
+    'Modbus':   ProtModbus
+}
+
+IMPLEMENTED_DP = {
+    'Siemens':  DataSiemens,
+    'Rockwell': DataRockwell,
+    'Modbus':   DataModbus
+}
 # --------------------
