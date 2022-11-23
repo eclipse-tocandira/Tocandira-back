@@ -28,7 +28,7 @@ from .plc_data import routes as plc_routes
 
 database.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(root_path=f"{Env.API_NAME}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,37 +44,35 @@ with SessionManager() as db:
         admin_usr = auth_schemas.UserCreate(name='admin', password='admin')
         Tuser.create(db,admin_usr)
 
-root = f"/{Env.API_NAME}/{Env.API_VERSION}"
-
 # Application Routes 
 
 ### Authentication
-app.add_api_route(root+"/login",
+app.add_api_route("/login",
     methods=["POST"], response_model=auth_schemas.LoginSucess,
     endpoint=auth_routes.authentication)
 
 ### Defaults
-app.add_api_route(root+"/protocol_defaults",
+app.add_api_route("/protocol_defaults",
     methods=["GET"], response_model=plc_schemas.simpleList,
     endpoint=plc_routes.get_protocol_defaults)
 
-app.add_api_route(root+"/datasource_defaults/{prot_name}",
+app.add_api_route("/datasource_defaults/{prot_name}",
     methods=["GET"], response_model=plc_schemas.dataSourceInfo,
     endpoint=plc_routes.get_datasource_defaults)
 
 ### DataSources
-app.add_api_route(root+"/datasource",
+app.add_api_route("/datasource",
     methods=["POST"], response_model=plc_schemas.dataSource,
     endpoint=plc_routes.create_datasource)
 
-app.add_api_route(root+"/datasource/{ds_name}",
+app.add_api_route("/datasource/{ds_name}",
     methods=["GET"], response_model=plc_schemas.dataSource,
     endpoint=plc_routes.get_datasource_by_name)
 
-app.add_api_route(root+"/datasources",
+app.add_api_route("/datasources",
     methods=["GET"], response_model=List[plc_schemas.dataSource],
     endpoint=plc_routes.get_datasources)
 
-app.add_api_route(root+"/datasources/range/{ini}-{end}",
+app.add_api_route("/datasources/range/{ini}-{end}",
     methods=["GET"], response_model=List[plc_schemas.dataSource],
     endpoint=plc_routes.get_datasources_by_range)

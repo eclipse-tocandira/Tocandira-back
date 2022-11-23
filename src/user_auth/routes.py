@@ -26,7 +26,7 @@ from .schemas import LoginData
 # XXX: The `oauth2_schema` needs to know the login route,
 #       so upon changing the login route on `main.py` file,
 #       remember to change the `tokenUrl` below to match
-oauth2_schema = OAuth2PasswordBearer(tokenUrl=f"/{Env.API_NAME}/{Env.API_VERSION}"+"/login")
+oauth2_schema = OAuth2PasswordBearer(tokenUrl=f"{Env.API_NAME}"+"/login")
 
 # NOTE: When documenting the routes, pretend that the `db` argument
 #       does not exist. Otherwise it will apear in the
