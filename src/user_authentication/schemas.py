@@ -4,18 +4,19 @@ expected in HTTP responses.\n
 Copyright (c) 2017 Aimirim STI.\n
 ## Dependencies are:
 * pydantic
+* fastapi
 '''
 
 # Import system libs
 from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordRequestForm
 
 #######################################
 
-class LoginData(BaseModel):
-    username: str
-    password: str
+class LoginData(OAuth2PasswordRequestForm):
+    pass
 
-class LoginSucesso(BaseModel):
+class LoginSucess(BaseModel):
     access_token: str
     token_type: str
 

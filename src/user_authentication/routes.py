@@ -9,25 +9,24 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Union
-from fastapi.security import OAuth2PasswordBearer
-from .schemas import LoginData, LoginSucesso
-
 
 # Import custom libs
-from ..database import get_db
 from ..crud import Tuser
-
-# Config
-SECRET_KEY = "9728256cbc2ecc81e478811a29aa5d0d8ae272b8deaec3c552cbb84b55a74908"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_schema = OAuth2PasswordBearer(tokenUrl='access_token')
+from ..database import get_db
+from ..env import Enviroment as Env
+from .schemas import LoginData
 
 #######################################
+
+# XXX: The `oauth2_schema` needs to know the login route,
+#       so upon changing the login route on `main.py` file,
+#       remember to change the `tokenUrl` below to match
+oauth2_schema = OAuth2PasswordBearer(tokenUrl=f"/{Env.API_NAME}/{Env.API_VERSION}"+"/login")
 
 # NOTE: When documenting the routes, pretend that the `db` argument
 #       does not exist. Otherwise it will apear in the
@@ -35,12 +34,10 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl='access_token')
 #       user shoud pass, but it is handled internaly by FastAPI.
 
 # --------------------
-def authentication(user: LoginData, db:Session=Depends(get_db)):
+def authentication(user: LoginData=Depends(), db:Session=Depends(get_db)):
     ''' Checks if the entered user is validated. \n
-    `db` (Session): Database session instance. \n
-    `username` (str): Username entered. \n
-    `password` (str): Password entered. \n
-    return `usr` (JSONResponse): return access token. \n
+    `user` (LoginData): Username and Password fields.\n
+    return `success` (JSONResponse): Return the access token and type. \n
     '''
     usr = Tuser.authenticate_user(db, user.username, user.password)
     if not usr:
@@ -49,16 +46,16 @@ def authentication(user: LoginData, db:Session=Depends(get_db)):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
+    access_token_expires = timedelta(minutes=int(Env.ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token = _create_access_token(
         data={"sub": usr.name}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    success = {"access_token": access_token, "token_type": "bearer"}
+    return(success)
 # --------------------
 
-
 # --------------------
-def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
+def _create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     ''' Create access token. \n
     `data` (dict): Dictionary with the user identification
     for which the token was generated. \n
@@ -71,56 +68,25 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, Env.SECRET_KEY, algorithm=Env.ALGORITHM)
     return encoded_jwt
 # --------------------
 
 # --------------------
-def token_validation(access_token: str):
-    ''' Check if the token is valid \n
-    `access_token` (str): token to be verified\n
-    return `usr.name` (str): username of the user to whom the token belongs\n
-    '''
-    payload = jwt.decode(access_token, SECRET_KEY, algorithms=ALGORITHM )
-    return payload.get('sub')
-# --------------------
-
-# --------------------
-def obter_usuario_logado(token: str = Depends(oauth2_schema),
-                         session: Session = Depends(get_db)):
+def _check_valid_token(token:str=Depends(oauth2_schema)):
     ''' Checks if a user is logged in \n
     `token` (str): Token to be validated. \n
-    `session` (Session): Database session instance. \n
-    return `` (): \n
+    return `usrname` (str): Name of the logged user.\n
     '''
     exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail='Usuario Não Logado')
+        status_code=status.HTTP_401_UNAUTHORIZED, detail='Not logged in')
     try:
-        name = token_validation(token)
+        payload = jwt.decode(token, Env.SECRET_KEY, algorithms=Env.ALGORITHM )
+        usrname = payload.get('sub')
+        if usrname is None:
+            raise exception
     except JWTError:
         raise exception
 
-    if not name:
-        raise exception
-
-    usr = Tuser.get_by_name(session, name = name)
-
-    if not usr:
-        raise exception
-
-    return usr.name
-# --------------------
-
-# --------------------
-def hello_word(acesse: LoginSucesso,
-               session :Session=Depends(get_db)):
-    ''' Função para retornar um "Hello World \n
-    `acesse` (LoginSucesso): Parametros de acesso\n
-    return `messagem` (str): messagem para ser vista\n
-    '''
-    user_login = obter_usuario_logado(acesse.access_token, session)
-    if user_login :
-        return "Hello Word"
-    else:
-        return "Usuario não logado"
+    return(usrname)
 # --------------------
