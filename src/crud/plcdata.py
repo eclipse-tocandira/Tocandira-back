@@ -219,6 +219,28 @@ class Tplcdata:
         
         return (ds_answer)
     # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datasources_by_range(db:Session, ini:int, end:int):
+        ''' Get all datasources.\n
+        `db` (Session): Database access session.\n
+        `ini` (int): First query result to show.\n
+        `end` (int): Last query result to show.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = []
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get Datasource list
+        for ds in dbq.offset(ini-1).limit(end).all():
+            prot = Tplcdata._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer.append( Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot)) )
+        
+        return (ds_answer)
+    # --------------------
     
     # --------------------
     @staticmethod

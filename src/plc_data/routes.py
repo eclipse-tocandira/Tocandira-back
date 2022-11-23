@@ -59,7 +59,7 @@ def get_datasource_defaults(prot_name:str):
 def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_db)):
     ''' Create an entry at in database to save this DataSource.\n
     `datasource` (schemas.dataSourceInfo): DataSource informations.\n
-    return `created` (JSONResponse): A boolean automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
     val_ds = Tplcdata.create_datasource(db,datasource)
@@ -75,7 +75,7 @@ def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_
 def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db)):
     ''' Search an entry in database with provided name.\n
     `ds_name` (str): DataSource name.\n
-    return `created` (JSONResponse): A boolean automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
     val_ds = Tplcdata.get_datasource_by_name(db, ds_name)
@@ -90,10 +90,31 @@ def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db)):
 # --------------------
 def get_datasources(db:Session=Depends(get_db)):
     ''' Get all datasource entries in database.\n
-    return `created` (JSONResponse): A boolean automatically parser into
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
     val_ds = Tplcdata.get_datasources(db)
+
+    if (val_ds==None):
+        m_name = f"Data Sources"
+        raise HTTPException(status_code=404, detail=f"Error searching for available {m_name}.")
+
+    return(val_ds)
+# --------------------
+
+# --------------------
+def get_datasources_by_range(ini:int, end:int, db:Session=Depends(get_db)):
+    ''' Get all datasource entries in database.\n
+    `ini` (int): First query result to show. Starts at `1`.\n
+    `end` (int): Last query result to show, inclusive. \n
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
+    a HTTP_OK response.\n
+    '''
+
+    if(ini<1):
+        raise HTTPException(status_code=401, detail=f"Range parameter error. Minimun value for `ini` is `1`.")
+
+    val_ds = Tplcdata.get_datasources_by_range(db,ini,end)
 
     if (val_ds==None):
         m_name = f"Data Sources"

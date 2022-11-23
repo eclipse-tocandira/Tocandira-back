@@ -49,6 +49,8 @@ with SessionManager() as db:
 root = f"/{Env.API_NAME}/{Env.API_VERSION}"
 
 # Application Routes 
+
+### Authentication
 app.add_api_route(root+"/login",
     methods=["POST"], response_model=auth_schemas.LoginSucesso,
     endpoint=auth_routes.authentication)
@@ -57,6 +59,7 @@ app.add_api_route(root+"/hello",
     methods=["POST"], response_model=str,
     endpoint=auth_routes.hello_word)
 
+### Defaults
 app.add_api_route(root+"/protocol_defaults",
     methods=["GET"], response_model=plc_schemas.simpleList,
     endpoint=plc_routes.get_protocol_defaults)
@@ -65,6 +68,7 @@ app.add_api_route(root+"/datasource_defaults/{prot_name}",
     methods=["GET"], response_model=plc_schemas.dataSourceInfo,
     endpoint=plc_routes.get_datasource_defaults)
 
+### DataSources
 app.add_api_route(root+"/datasource",
     methods=["POST"], response_model=plc_schemas.dataSource,
     endpoint=plc_routes.create_datasource)
@@ -76,3 +80,7 @@ app.add_api_route(root+"/datasource/{ds_name}",
 app.add_api_route(root+"/datasources",
     methods=["GET"], response_model=List[plc_schemas.dataSource],
     endpoint=plc_routes.get_datasources)
+
+app.add_api_route(root+"/datasources/range/{ini}-{end}",
+    methods=["GET"], response_model=List[plc_schemas.dataSource],
+    endpoint=plc_routes.get_datasources_by_range)
