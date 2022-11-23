@@ -18,8 +18,8 @@ from . import database
 from .env import Enviroment as Env
 from .crud import Tuser
 from .database import SessionManager, engine
-from .user_authentication import schemas as auth_schemas
-from .user_authentication import routes as auth_routes
+from .user_auth import schemas as auth_schemas
+from .user_auth import routes as auth_routes
 from .plc_data import schemas as plc_schemas
 from .plc_data import routes as plc_routes
 

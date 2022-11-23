@@ -13,7 +13,7 @@ from passlib.context import CryptContext
 
 # Import custom libs
 from .. import models
-from ..user_authentication import schemas
+from ..user_auth import schemas
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
