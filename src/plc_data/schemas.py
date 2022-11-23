@@ -11,13 +11,9 @@ from pydantic import BaseModel
 
 #######################################
 
-class simpleList(BaseModel):
+class comboBox(BaseModel):
     defaultValue: str
     menuItems: list
-
-class simpleConfirmation(BaseModel):
-    id: int
-    name: str
 
 class protocolInfo(BaseModel):
     name: str

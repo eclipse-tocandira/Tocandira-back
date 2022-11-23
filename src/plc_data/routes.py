@@ -27,7 +27,7 @@ from ..user_auth import routes as usr_routes
 # --------------------
 def get_protocol_defaults(usr:str = Depends(usr_routes._check_valid_token)):
     ''' Get the list of DataSource protocols available.\n
-    return `val_list` (JSONResponse): A `schemas.simpleList` object
+    return `val_list` (JSONResponse): A `schemas.comboBox` object
     automatically parsed into an HTTP_OK response.\n
     '''
     val_list = Tplcdata.get_avail_protocols()

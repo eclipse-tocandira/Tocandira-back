@@ -53,7 +53,7 @@ app.add_api_route("/login",
 
 ### Defaults
 app.add_api_route("/protocol_defaults",
-    methods=["GET"], response_model=plc_schemas.simpleList,
+    methods=["GET"], response_model=plc_schemas.comboBox,
     endpoint=plc_routes.get_protocol_defaults)
 
 app.add_api_route("/datasource_defaults/{prot_name}",

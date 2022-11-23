@@ -25,9 +25,9 @@ class Tplcdata:
     @staticmethod
     def get_avail_protocols():
         ''' Search in DEFAULTS for the listed Protocols.\n
-        return (schemas.simpleList): All protocols.\n
+        return (schemas.comboBox): All protocols.\n
         '''
-        prot_avail = schemas.simpleList(defaultValue='',menuItems=list(Env.DEFAULTS['Protocol'].keys()))
+        prot_avail = schemas.comboBox(defaultValue='',menuItems=list(Env.DEFAULTS['Protocol'].keys()))
 
         return(prot_avail)
     # --------------------
@@ -49,7 +49,7 @@ class Tplcdata:
             p_info = {}
             for key, val in this_prot['protocol'].items():
                 if('valid' in val.keys()):
-                    p_info[key] = schemas.simpleList(defaultValue=val['value'],menuItems=val['valid'])
+                    p_info[key] = schemas.comboBox(defaultValue=val['value'],menuItems=val['valid'])
                 else:
                     p_info[key] = val['value']
             
