@@ -68,3 +68,11 @@ app.add_api_route(root+"/datasource_defaults/{prot_name}",
 app.add_api_route(root+"/datasource",
     methods=["POST"], response_model=plc_schemas.dataSource,
     endpoint=plc_routes.create_datasource)
+
+app.add_api_route(root+"/datasource/{ds_name}",
+    methods=["GET"], response_model=plc_schemas.dataSource,
+    endpoint=plc_routes.get_datasource_by_name)
+
+app.add_api_route(root+"/datasources",
+    methods=["GET"], response_model=List[plc_schemas.dataSource],
+    endpoint=plc_routes.get_datasources)

@@ -70,3 +70,34 @@ def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_
 
     return(val_ds)
 # --------------------
+
+# --------------------
+def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db)):
+    ''' Search an entry in database with provided name.\n
+    `ds_name` (str): DataSource name.\n
+    return `created` (JSONResponse): A boolean automatically parser into
+    a HTTP_OK response.\n
+    '''
+    val_ds = Tplcdata.get_datasource_by_name(db, ds_name)
+
+    if (val_ds==None):
+        m_name = f"Data Source '{ds_name}'"
+        raise HTTPException(status_code=404, detail=f"Error searching for available {m_name}.")
+
+    return(val_ds)
+# --------------------
+
+# --------------------
+def get_datasources(db:Session=Depends(get_db)):
+    ''' Get all datasource entries in database.\n
+    return `created` (JSONResponse): A boolean automatically parser into
+    a HTTP_OK response.\n
+    '''
+    val_ds = Tplcdata.get_datasources(db)
+
+    if (val_ds==None):
+        m_name = f"Data Sources"
+        raise HTTPException(status_code=404, detail=f"Error searching for available {m_name}.")
+
+    return(val_ds)
+# --------------------

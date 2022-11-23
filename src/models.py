@@ -29,7 +29,7 @@ class DataPoint(Base):
     __tablename__ = "datapoints"
     id = Column(Integer, primary_key=True, index=True)
     # Items
-    name = Column(String)
+    name = Column(String, index=True)
     description = Column(String)
     num_type = Column(String)
     access = Column(String, nullable=False)
@@ -45,7 +45,7 @@ class DataSource(Base):
     __tablename__ = "datasources"
     id = Column(Integer, primary_key=True, index=True)
     # Items
-    name = Column(String)
+    name = Column(String, index=True)
     plc_ip = Column(String)
     plc_port = Column(Integer)
     cycletime = Column(Integer)
@@ -139,13 +139,13 @@ class DataModbus(DataPoint):
 # --------------------
 
 # --------------------
-IMPLEMENTED_DS = {
+IMPLEMENTED_PROT = {
     'Siemens':  ProtSiemens,
     'Rockwell': ProtRockwell,
     'Modbus':   ProtModbus
 }
 
-IMPLEMENTED_DP = {
+IMPLEMENTED_DATA = {
     'Siemens':  DataSiemens,
     'Rockwell': DataRockwell,
     'Modbus':   DataModbus

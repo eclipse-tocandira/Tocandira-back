@@ -69,6 +69,71 @@ class Tplcdata:
 
     # --------------------
     @staticmethod
+    def _parse_protocol(db_prot:models.Protocol):
+        ''' Parde DB protocol table item to corresponding schema.\n
+        `db_prot` (models.Protocol): Protocol table item.\n
+        return `prot` (schemas.protocol): Parsed protocol information.\n
+        '''
+        
+        # Tranlate protocol table to specific implementation
+        prot_data = {}
+        for prop, value in db_prot.__dict__.items():
+            if (not prop.startswith('_') and 'id' not in prop and 'name'!=prop):
+                prot_data[prop] = value
+
+        # Prepare answer
+        prot = schemas.protocol(
+            id=db_prot.id,
+            name=db_prot.name,
+            data=prot_data)
+            
+        return(prot)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def _parse_datasource(db_ds:models.DataSource,prot:schemas.protocol):
+        ''' Parde DB datasource table item to corresponding schema.\n
+        `db_ds` (models.DataSource): Datasource table item.\n
+        `prot` (schemas.protocol): Protocol parsed information.\n
+        return `ds` (schemas.dataSource): Parsed datasource information.\n
+        '''
+
+        # Prepare answer
+        ds = schemas.dataSource(
+            id=db_ds.id,
+            name=db_ds.name,
+            plc_ip=db_ds.plc_ip,
+            plc_port=db_ds.plc_port,
+            cycletime=db_ds.cycletime,
+            timeout=db_ds.timeout,
+            status=db_ds.status,
+            protocol=prot
+        )
+
+        return(ds)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def _find_datasource_prototol(db:Session, db_ds:models.DataSource):
+        ''' Parde DB table to corresponding schema.\n
+        `db` (Session): Database access session.\n
+        `db_ds` (models.DataSource): Datasource table item.\n
+        return `sb_prot` (models.Protocol): Corresponding protocol table item.\n
+        '''
+        # Get protocol infos
+        p_id = db_ds.protocol.id
+        p_name = db_ds.protocol.name
+        # Search protocol Table
+        prot_cls = models.IMPLEMENTED_PROT[p_name]
+        prot = db.query(prot_cls).filter(prot_cls.id == p_id).first()
+
+        return(prot)
+    # --------------------
+
+    # --------------------
+    @staticmethod
     def create_protocol(db: Session, new_prot:schemas.protocolInfo, ds:models.DataSource):
         ''' Create a new protocol.\n
         `db` (Session): Database access session.\n
@@ -81,9 +146,9 @@ class Tplcdata:
         '''
         prot_created = None
 
-        if new_prot.name in models.IMPLEMENTED_DS.keys():
+        if new_prot.name in models.IMPLEMENTED_PROT.keys():
             # Look for protocol implementations
-            prot_cls = models.IMPLEMENTED_DS[new_prot.name]
+            prot_cls = models.IMPLEMENTED_PROT[new_prot.name]
             # Instanciate the selected protocol
             db_prot = prot_cls(name=new_prot.name, datasource=ds)
             
@@ -96,18 +161,9 @@ class Tplcdata:
             db.commit()
             db.refresh(db_prot)
 
-            # Tranlate protocol table to 
-            prot_data = {}
-            for prop, value in db_prot.__dict__.items():
-                if (not prop.startswith('_') and 'id' not in prop and 'name'!=prop):
-                    prot_data[prop] = value
-
             # Prepare answer
-            prot_created = schemas.protocol(
-                id=db_prot.id,
-                name=db_prot.name,
-                data=prot_data)
-
+            prot_created = Tplcdata._parse_protocol(db_prot)
+            
         return(prot_created)
     # --------------------
 
@@ -117,13 +173,14 @@ class Tplcdata:
         ''' Create a new datasource with the corresponding protocol
         but without any datapoint associated with it.\n
         `db` (Session): Database access session.\n
-        `new_ds` (schemas.dataSourceInfo): \n
+        `new_ds` (schemas.dataSourceInfo): Informations on the new
+        datasource to create.\n
         return `ds_created` (schemas.dataSource): The created table item
         information.\n
         '''
         ds_created = None
 
-        if new_ds.protocol.name in models.IMPLEMENTED_DS.keys():
+        if new_ds.protocol.name in models.IMPLEMENTED_PROT.keys():
 
             # Instanciate DataSource
             db_ds = models.DataSource( name=new_ds.name,
@@ -137,18 +194,52 @@ class Tplcdata:
 
             # Create the corresponding protocol
             prot_created = Tplcdata.create_protocol(db, new_ds.protocol, db_ds)
-
-            # Prepare answer
-            ds_created = schemas.dataSource(
-                id=db_ds.id,
-                name=db_ds.name,
-                plc_ip=db_ds.plc_ip,
-                plc_port=db_ds.plc_port,
-                cycletime=db_ds.cycletime,
-                timeout=db_ds.timeout,
-                status=db_ds.status,
-                protocol=prot_created
-            )
+            # Parse information
+            ds_created = Tplcdata._parse_datasource(db_ds, prot_created)
         
         return(ds_created)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datasources(db:Session):
+        ''' Get all datasources.\n
+        `db` (Session): Database access session.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = []
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get Datasource list
+        for ds in dbq.all():
+            prot = Tplcdata._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer.append( Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot)) )
+        
+        return (ds_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def get_datasource_by_name(db:Session, ds_name:str):
+        ''' Search datasource by name.\n
+        `db` (Session): Database access session.\n
+        `ds_name` (str): DataSource name.\n
+        return `ds_answer` (schemas.dataSource): Datasource found, `None` if
+        not found.\n
+        '''
+        ds_answer = None
+
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        if (ds is not None):
+            prot = Tplcdata._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer = Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot))
+        
+        return (ds_answer)
     # --------------------
