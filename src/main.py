@@ -7,7 +7,7 @@ Copyright (c) 2017 Aimirim STI.\n
 '''
 
 # Import system libs
-from typing import List
+from typing import Dict, List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -69,6 +69,10 @@ app.add_api_route("/datasource/{ds_name}",
     methods=["GET"], response_model=ds_schemas.dataSource,
     endpoint=ds_routes.get_datasource_by_name)
 
+app.add_api_route("/datasource/{ds_name}/{active}",
+    methods=["POST"], response_model=Dict[str,bool],
+    endpoint=ds_routes.activate_datasource)
+
 app.add_api_route("/datasources",
     methods=["GET"], response_model=List[ds_schemas.dataSource],
     endpoint=ds_routes.get_datasources)
@@ -76,3 +80,15 @@ app.add_api_route("/datasources",
 app.add_api_route("/datasources/range/{ini}-{end}",
     methods=["GET"], response_model=List[ds_schemas.dataSource],
     endpoint=ds_routes.get_datasources_by_range)
+
+app.add_api_route("/datasources/pending",
+    methods=["GET"], response_model=List[ds_schemas.dataSource],
+    endpoint=ds_routes.get_datasources_pending)
+
+app.add_api_route("/datasources/active",
+    methods=["GET"], response_model=List[ds_schemas.dataSource],
+    endpoint=ds_routes.get_datasources_active)
+
+app.add_api_route("/datasources/confirm",
+    methods=["POST"], response_model=Dict[str,bool],
+    endpoint=ds_routes.confirm_datasources)

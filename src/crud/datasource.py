@@ -7,6 +7,7 @@ Copyright (c) 2017 Aimirim STI.\n
 '''
 
 # Import system libs
+from typing import List
 from sqlalchemy.orm import Session
 
 # Import custom libs
@@ -60,7 +61,6 @@ class Tdatasource:
                 plc_port=int(this_prot['plc_port']['value']),
                 cycletime=int(Env.CYCLETIME),
                 timeout=int(this_prot['timeout']['value']),
-                status=False,
                 protocol=schemas.protocolInfo(name=prot_name, data=p_info)
             )
 
@@ -107,7 +107,8 @@ class Tdatasource:
             plc_port=db_ds.plc_port,
             cycletime=db_ds.cycletime,
             timeout=db_ds.timeout,
-            status=db_ds.status,
+            active=db_ds.active,
+            pending=db_ds.pending,
             protocol=prot
         )
 
@@ -241,6 +242,74 @@ class Tdatasource:
         
         return (ds_answer)
     # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datasources_pending(db:Session):
+        ''' Get all datasources that are pending.\n
+        `db` (Session): Database access session.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = []
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get Datasource list
+        for ds in dbq.filter(models.DataSource.pending==True).all():
+            prot = Tdatasource._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer.append( Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot)) )
+        
+        return (ds_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def get_datasources_active(db:Session):
+        ''' Get all datasources that are active.\n
+        `db` (Session): Database access session.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = []
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get Datasource list
+        for ds in dbq.filter(models.DataSource.active==True).all():
+            prot = Tdatasource._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer.append( Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot)) )
+        
+        return (ds_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def confirm_datasources(db:Session, ds_names:List[str]):
+        ''' Set specified datasources to pending `False`.\n
+        `db` (Session): Database access session.\n
+        `ds_names` (list): List of DataSource names.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        for ds_name in ds_names:
+            # Get specific Datasource
+            ds = dbq.filter(models.DataSource.name == ds_name).first()
+            if (ds is not None):
+                # Insert in database
+                ds.pending = False
+                db.commit()
+                # Parse data
+                ds_answer[ds_name] = True
+            else:
+                ds_answer[ds_name] = False
+            
+        return (ds_answer)
+    # --------------------
     
     # --------------------
     @staticmethod
@@ -265,3 +334,32 @@ class Tdatasource:
         
         return (ds_answer)
     # --------------------
+
+    # --------------------
+    @staticmethod
+    def activate_datasource(db:Session, ds_name:str, active:bool):
+        ''' Get all datasources that are pending.\n
+        `db` (Session): Database access session.\n
+        `ds_name` (str): DataSource names.\n
+        `active` (bool): Activate state value.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        if (ds is not None):
+            # Insert in database
+            ds.active = active
+            db.commit()
+            # Parse data
+            ds_answer[ds_name] = True
+        else:
+            ds_answer[ds_name] = False
+        
+        return (ds_answer)
+    # --------------------
+    

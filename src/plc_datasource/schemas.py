@@ -25,11 +25,12 @@ class dataSourceInfo(BaseModel):
     plc_port: int
     cycletime: int
     timeout: int
-    status: bool
     protocol: protocolInfo
 
 class protocol(protocolInfo):
     id: int
 class dataSource(dataSourceInfo):
     id: int
+    active: bool
+    pending: bool
     protocol: protocol

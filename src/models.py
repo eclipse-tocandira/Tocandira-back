@@ -50,7 +50,8 @@ class DataSource(Base):
     plc_port = Column(Integer)
     cycletime = Column(Integer)
     timeout = Column(Integer)
-    status = Column(Boolean, default=False)
+    active = Column(Boolean, default=True)
+    pending = Column(Boolean, default=True)
     # Other tables
     protocol = relationship("Protocol", back_populates="datasource", uselist=False)# 1 to 1
     datapoints = relationship("DataPoint", back_populates="datasource")# 1 to N
