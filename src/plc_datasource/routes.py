@@ -1,6 +1,6 @@
 '''
 This module hold the endpoints for the 
-plc_data feature.\n
+plc_datasource feature.\n
 Copyright (c) 2017 Aimirim STI.\n
 ## Dependencies are:
 * fastapi
@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 # Import custom libs
 from . import schemas
 from ..database import get_db
-from ..crud import Tplcdata
+from ..crud import Tdatasource
 from ..user_auth import routes as usr_routes
 
 #######################################
@@ -30,7 +30,7 @@ def get_protocol_defaults(usr:str = Depends(usr_routes._check_valid_token)):
     return `val_list` (JSONResponse): A `schemas.comboBox` object
     automatically parsed into an HTTP_OK response.\n
     '''
-    val_list = Tplcdata.get_avail_protocols()
+    val_list = Tdatasource.get_avail_protocols()
     
     if (val_list==None):
         m_name = "protocols"
@@ -46,7 +46,7 @@ def get_datasource_defaults(prot_name:str, usr:str = Depends(usr_routes._check_v
     return `val_dict` (JSONResponse): A `schemas.dataSourceInfo` object
     automatically parsed into an HTTP_OK response.\n
     '''
-    val_dict = Tplcdata.get_datasource_placeholder(prot_name)
+    val_dict = Tdatasource.get_datasource_placeholder(prot_name)
     
     if (val_dict==None):
         m_name = f"datasource information for Protocol: '{prot_name}'"
@@ -62,7 +62,7 @@ def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_
     return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_ds = Tplcdata.create_datasource(db,datasource)
+    val_ds = Tdatasource.create_datasource(db,datasource)
 
     if (val_ds==None):
         m_name = f"Data Source '{datasource.name}'"
@@ -78,7 +78,7 @@ def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str = De
     return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_ds = Tplcdata.get_datasource_by_name(db, ds_name)
+    val_ds = Tdatasource.get_datasource_by_name(db, ds_name)
 
     if (val_ds==None):
         m_name = f"Data Source '{ds_name}'"
@@ -93,7 +93,7 @@ def get_datasources(db:Session=Depends(get_db), usr:str = Depends(usr_routes._ch
     return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_ds = Tplcdata.get_datasources(db)
+    val_ds = Tdatasource.get_datasources(db)
 
     if (val_ds==None):
         m_name = f"Data Sources"
@@ -114,7 +114,7 @@ def get_datasources_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:s
     if(ini<1):
         raise HTTPException(status_code=401, detail=f"Range parameter error. Minimun value for `ini` is `1`.")
 
-    val_ds = Tplcdata.get_datasources_by_range(db,ini,end)
+    val_ds = Tdatasource.get_datasources_by_range(db,ini,end)
 
     if (val_ds==None):
         m_name = f"Data Sources"

@@ -1,6 +1,6 @@
 '''
 This module holds the functions to
-access the PlcData Table\n
+access the DataSource Table\n
 Copyright (c) 2017 Aimirim STI.\n
 ## Dependencies are:
 * sqlalchemy
@@ -12,13 +12,13 @@ from sqlalchemy.orm import Session
 # Import custom libs
 from .. import models
 from ..env import Enviroment as Env
-from ..plc_data import schemas
+from ..plc_datasource import schemas
 
 
 #######################################
 
-class Tplcdata:
-    ''' Class with CRUD methods to access the PlcData table.\n
+class Tdatasource:
+    ''' Class with CRUD methods to access the DataSource table.\n
     '''
     
     # --------------------
@@ -162,7 +162,7 @@ class Tplcdata:
             db.refresh(db_prot)
 
             # Prepare answer
-            prot_created = Tplcdata._parse_protocol(db_prot)
+            prot_created = Tdatasource._parse_protocol(db_prot)
             
         return(prot_created)
     # --------------------
@@ -193,9 +193,9 @@ class Tplcdata:
             db.refresh(db_ds)
 
             # Create the corresponding protocol
-            prot_created = Tplcdata.create_protocol(db, new_ds.protocol, db_ds)
+            prot_created = Tdatasource.create_protocol(db, new_ds.protocol, db_ds)
             # Parse information
-            ds_created = Tplcdata._parse_datasource(db_ds, prot_created)
+            ds_created = Tdatasource._parse_datasource(db_ds, prot_created)
         
         return(ds_created)
     # --------------------
@@ -213,9 +213,9 @@ class Tplcdata:
 
         # Get Datasource list
         for ds in dbq.all():
-            prot = Tplcdata._find_datasource_prototol(db,ds)
+            prot = Tdatasource._find_datasource_prototol(db,ds)
             # Parse data
-            ds_answer.append( Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot)) )
+            ds_answer.append( Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot)) )
         
         return (ds_answer)
     # --------------------
@@ -235,9 +235,9 @@ class Tplcdata:
 
         # Get Datasource list
         for ds in dbq.offset(ini-1).limit(end).all():
-            prot = Tplcdata._find_datasource_prototol(db,ds)
+            prot = Tdatasource._find_datasource_prototol(db,ds)
             # Parse data
-            ds_answer.append( Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot)) )
+            ds_answer.append( Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot)) )
         
         return (ds_answer)
     # --------------------
@@ -259,9 +259,9 @@ class Tplcdata:
         # Get specific Datasource
         ds = dbq.filter(models.DataSource.name == ds_name).first()
         if (ds is not None):
-            prot = Tplcdata._find_datasource_prototol(db,ds)
+            prot = Tdatasource._find_datasource_prototol(db,ds)
             # Parse data
-            ds_answer = Tplcdata._parse_datasource(ds, Tplcdata._parse_protocol(prot))
+            ds_answer = Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot))
         
         return (ds_answer)
     # --------------------

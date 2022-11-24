@@ -1,5 +1,5 @@
 '''
-This module contais the schemas
+This module contaims the schemas
 expected in HTTP responses.\n
 Copyright (c) 2017 Aimirim STI.\n
 ## Dependencies are:

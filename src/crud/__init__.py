@@ -1,4 +1,5 @@
 # Copyright (c) 2017 Aimirim STI.
 
 from .user import Tuser
-from .plcdata import Tplcdata
+from .datasource import Tdatasource
+from .datapoint import Tdatapoint
