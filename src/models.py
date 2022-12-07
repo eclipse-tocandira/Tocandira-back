@@ -24,6 +24,15 @@ class User(Base):
     password = Column(String)
     is_admin = Column(Boolean, default=True)
 
+class Collector(Base):
+    __tablename__ = "collector"
+
+    id = Column(Integer, primary_key=True, index=True)
+    ip = Column(String)
+    port = Column(Integer)
+    update_period = Column(Integer)
+    timeout = Column(Integer)
+    
 # --------------------
 class DataPoint(Base):
     __tablename__ = "datapoints"
