@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Import custom libs
 from . import database
 from .env import Enviroment as Env
-from .crud import Tuser
+from .crud import Tuser, Tcollector
 from .database import SessionManager, engine
 from .user_auth import schemas as auth_schemas
 from .user_auth import routes as auth_routes
@@ -22,6 +22,8 @@ from .plc_datasource import schemas as ds_schemas
 from .plc_datasource import routes as ds_routes
 from .plc_datapoint import schemas as dp_schemas
 from .plc_datapoint import routes as dp_routes
+from .collector import schemas as col_schemas
+from .collector import routes as col_routes
 
 
 #######################################
@@ -38,11 +40,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Check for users and create a default one if it is empty
 with SessionManager() as db:
+    # Check for users and create a default one if empty
     if (len(Tuser.get_all(db))==0):
         admin_usr = auth_schemas.UserCreate(name='admin', password='admin')
         Tuser.create(db,admin_usr)
+
+    # Check for Collector information and create a default one if empty
+    if (len(Tcollector.get_all(db))==0):
+        col_data = col_schemas.collectorInfo(ip='127.0.0.1', port=4840,
+            update_period=30, timeout=30)
+        Tcollector.create(db,col_data)
+
 
 # Application Routes 
 
@@ -59,6 +68,15 @@ app.add_api_route("/protocol_defaults",
 app.add_api_route("/datasource_defaults/{prot_name}",
     methods=["GET"], response_model=ds_schemas.dataSourceInfo,
     endpoint=ds_routes.get_datasource_defaults)
+
+### Collector
+app.add_api_route("/collector",
+    methods=["PUT"], response_model=col_schemas.collectorInfo,
+    endpoint=col_routes.update_collector)
+
+app.add_api_route("/collector",
+    methods=["GET"], response_model=col_schemas.collectorInfo,
+    endpoint=col_routes.get_collector)
 
 ### DataSources
 app.add_api_route("/datasource",
