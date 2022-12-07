@@ -88,7 +88,7 @@ def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depe
 # --------------------
 
 # --------------------
-def activate_datasource(ds_name:str, active:bool, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+def change_datasource_active_status(ds_name:str, active:bool, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name and change it's activated state.\n
     `ds_name` (str): DataSource name.\n
     `active` (bool): Active state.\n

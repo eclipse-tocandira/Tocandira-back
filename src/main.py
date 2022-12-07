@@ -89,7 +89,7 @@ app.add_api_route("/datasource/{ds_name}",
 
 app.add_api_route("/datasource/{ds_name}={active}",
     methods=["PUT"], response_model=Dict[str,bool],
-    endpoint=ds_routes.activate_datasource)
+    endpoint=ds_routes.change_datasource_active_status)
 
 app.add_api_route("/datasources",
     methods=["GET"], response_model=List[ds_schemas.dataSource],
