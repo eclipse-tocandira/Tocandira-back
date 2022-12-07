@@ -285,10 +285,10 @@ class Tdatasource:
     
     # --------------------
     @staticmethod
-    def confirm_datasources(db:Session, ds_names:List[str]):
+    def confirm_datasource(db:Session, ds_name:str):
         ''' Set specified datasources to pending `False`.\n
         `db` (Session): Database access session.\n
-        `ds_names` (list): List of DataSource names.\n
+        `ds_name` (str): DataSource name.\n
         return `ds_answer` (list): List of datasources in database.\n
         '''
         ds_answer = {}
@@ -296,17 +296,16 @@ class Tdatasource:
         # Declare the query
         dbq = db.query(models.DataSource)
 
-        for ds_name in ds_names:
-            # Get specific Datasource
-            ds = dbq.filter(models.DataSource.name == ds_name).first()
-            if (ds is not None):
-                # Insert in database
-                ds.pending = False
-                db.commit()
-                # Parse data
-                ds_answer[ds_name] = True
-            else:
-                ds_answer[ds_name] = False
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        if (ds is not None):
+            # Insert in database
+            ds.pending = False
+            db.commit()
+            # Parse data
+            ds_answer[ds_name] = True
+        else:
+            ds_answer[ds_name] = False
             
         return (ds_answer)
     # --------------------

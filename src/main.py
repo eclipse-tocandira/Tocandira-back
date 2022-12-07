@@ -87,8 +87,8 @@ app.add_api_route("/datasource/{ds_name}",
     methods=["GET"], response_model=ds_schemas.dataSource,
     endpoint=ds_routes.get_datasource_by_name)
 
-app.add_api_route("/datasource/{ds_name}/{active}",
-    methods=["POST"], response_model=Dict[str,bool],
+app.add_api_route("/datasource/{ds_name}={active}",
+    methods=["PUT"], response_model=Dict[str,bool],
     endpoint=ds_routes.activate_datasource)
 
 app.add_api_route("/datasources",
@@ -107,6 +107,6 @@ app.add_api_route("/datasources/active",
     methods=["GET"], response_model=List[ds_schemas.dataSource],
     endpoint=ds_routes.get_datasources_active)
 
-app.add_api_route("/datasources/confirm",
-    methods=["POST"], response_model=Dict[str,bool],
+app.add_api_route("/datasource/{ds_name}/confirm",
+    methods=["PUT"], response_model=Dict[str,bool],
     endpoint=ds_routes.confirm_datasources)

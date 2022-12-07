@@ -105,13 +105,13 @@ def activate_datasource(ds_name:str, active:bool, db:Session=Depends(get_db), us
 # --------------------
 
 # --------------------
-def confirm_datasources(ds_names:list, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+def confirm_datasources(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search the names in database and change their pending state to False.\n
-    `ds_names` (list): List of DataSource names.\n
+    `ds_name` (str): DataSource name.\n
     return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_ds = Tdatasource.confirm_datasources(db, ds_names)
+    val_ds = Tdatasource.confirm_datasource(db, ds_name)
 
     if (val_ds is None):
         m_name = f"Data Source"
