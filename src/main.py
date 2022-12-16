@@ -59,6 +59,9 @@ with SessionManager() as db:
 app.add_api_route("/login",
     methods=["POST"], response_model=auth_schemas.LoginSucess,
     endpoint=auth_routes.authentication)
+app.add_api_route("/validate",
+    methods=["GET"], response_model=bool,
+    endpoint=auth_routes.check_token)
 
 ### Defaults
 app.add_api_route("/protocol_defaults",

@@ -97,3 +97,13 @@ def _check_valid_token(token:str=Depends(oauth2_schema)):
 
     return(usrname)
 # --------------------
+
+# --------------------
+def check_token(usr:str=Depends(_check_valid_token)):
+    ''' A dummy route to check the token validation.\n
+    return `True`: In case of unauthorized access the exception
+    will be raised as `HTTP_401_UNAUTHORIZED` when processing the
+    header.\n
+    '''
+    return(True)
+# --------------------
