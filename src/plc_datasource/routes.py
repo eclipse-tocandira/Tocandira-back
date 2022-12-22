@@ -92,6 +92,22 @@ def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depe
 # --------------------
 
 # --------------------
+def update_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+    ''' Search an entry in database with provided name and update it's informations.\n
+    `datasource` (schemas.dataSourceInfo): DataSource informations.\n
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    a HTTP_OK response.\n
+    '''
+    val_ds = Tdatasource.update_datasource(db, datasource)
+
+    if (val_ds is None):
+        m_name = f"Data Source '{datasource.name}'"
+        raise HTTPException(status_code=404, detail=f"Error updating {m_name}.")
+
+    return(val_ds)
+# --------------------
+
+# --------------------
 def change_datasource_active_status(ds_name:str, active:bool, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name and change it's activated state.\n
     `ds_name` (str): DataSource name.\n

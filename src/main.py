@@ -86,6 +86,10 @@ app.add_api_route("/datasource",
     methods=["POST"], response_model=ds_schemas.dataSource,
     endpoint=ds_routes.create_datasource)
 
+app.add_api_route("/datasource",
+    methods=["PUT"], response_model=ds_schemas.dataSource,
+    endpoint=ds_routes.update_datasource)
+
 app.add_api_route("/datasource/{ds_name}",
     methods=["GET"], response_model=ds_schemas.dataSource,
     endpoint=ds_routes.get_datasource_by_name)

@@ -201,6 +201,48 @@ class Tdatasource:
     # --------------------
 
     # --------------------
+    def update_datasource(db: Session, ds_update: schemas.dataSourceInfo):
+        ''' Search for a datasources and update it's informations.\n
+        `db` (Session): Database access session.\n
+        `ds_update` (schemas.dataSourceInfo): Informations on the new
+        datasource to create.\n
+        return `ds_answer` (schemas.dataSource): The modified datasource.\n
+        '''
+        ds_answer = None
+
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_update.name).first()
+        if (ds is not None):
+            # Get it's protocol
+            prot = Tdatasource._find_datasource_prototol(db,ds)
+            
+            # Update matching parameters in DataSource
+            for param, value in ds.__dict__.items():
+                if (param in ['protocol','name']):
+                    continue
+                if param in ds_update.__dict__.keys():
+                    value = getattr(ds_update,param)
+                setattr(ds,param,value)
+                
+            # Update matching parameters in Protocol
+            for param, value in prot.__dict__.items():
+                if param in ds_update.protocol.data.keys():
+                    value = ds_update.protocol.data[param]
+                setattr(prot,param,value)
+
+            # Parse data
+            ds_answer = Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot))
+            
+            # Insert changes in database
+            db.commit()
+
+        return (ds_answer)
+    # --------------------
+
+    # --------------------
     @staticmethod
     def get_datasources(db:Session):
         ''' Get all datasources.\n
