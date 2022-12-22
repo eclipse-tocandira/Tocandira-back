@@ -101,7 +101,6 @@ class Tdatasource:
 
         # Prepare answer
         ds = schemas.dataSource(
-            id=db_ds.id,
             name=db_ds.name,
             plc_ip=db_ds.plc_ip,
             plc_port=db_ds.plc_port,
@@ -337,7 +336,7 @@ class Tdatasource:
     # --------------------
     @staticmethod
     def activate_datasource(db:Session, ds_name:str, active:bool):
-        ''' Get all datasources that are pending.\n
+        ''' Set active state of a datasource.\n
         `db` (Session): Database access session.\n
         `ds_name` (str): DataSource names.\n
         `active` (bool): Activate state value.\n

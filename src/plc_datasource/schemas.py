@@ -29,8 +29,8 @@ class dataSourceInfo(BaseModel):
 
 class protocol(protocolInfo):
     id: int
+
 class dataSource(dataSourceInfo):
-    id: int
     active: bool
     pending: bool
     protocol: protocol

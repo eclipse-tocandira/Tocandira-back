@@ -62,7 +62,11 @@ def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_
     return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_ds = Tdatasource.create_datasource(db,datasource)
+    try:
+        val_ds = Tdatasource.create_datasource(db,datasource)
+    except Exception as exc:
+        msg = str(exc).split('\n')[0]
+        raise HTTPException(status_code=520, detail=msg)
 
     if (val_ds is None):
         m_name = f"Data Source '{datasource.name}'"

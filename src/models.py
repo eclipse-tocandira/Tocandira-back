@@ -36,15 +36,15 @@ class Collector(Base):
 # --------------------
 class DataPoint(Base):
     __tablename__ = "datapoints"
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
     # Items
-    name = Column(String, index=True)
+    name = Column(String, primary_key=True, index=True)
     description = Column(String)
     num_type = Column(String)
     access = Column(String, nullable=False)
     # Other tables
     datasource = relationship("DataSource", back_populates="datapoints")# N to 1
-    datasource_id = Column(Integer, ForeignKey("datasources.id"))
+    datasource_name = Column(Integer, ForeignKey("datasources.name"))
     # Allow inheritance
     __mapper_args__ = {'polymorphic_on': access}
 # --------------------
@@ -52,9 +52,9 @@ class DataPoint(Base):
 # --------------------
 class DataSource(Base):
     __tablename__ = "datasources"
-    id = Column(Integer, primary_key=True, index=True)
+    # id = Column(Integer, primary_key=True, index=True)
     # Items
-    name = Column(String, index=True)
+    name = Column(String, primary_key=True, index=True)
     plc_ip = Column(String)
     plc_port = Column(Integer)
     cycletime = Column(Integer)
@@ -74,7 +74,7 @@ class Protocol(Base):
     name = Column(String, nullable=False)
     # Other tables
     datasource = relationship("DataSource", back_populates="protocol")# 1 to 1
-    datasource_id = Column(Integer, ForeignKey("datasources.id"))
+    datasource_name = Column(Integer, ForeignKey("datasources.name"))
     # Allow inheritance
     __mapper_args__ = {'polymorphic_on': name,'polymorphic_identity' : 'protocol'}
 # --------------------
