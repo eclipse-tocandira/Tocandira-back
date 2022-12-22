@@ -361,3 +361,31 @@ class Tdatasource:
         return (ds_answer)
     # --------------------
     
+    # --------------------
+    @staticmethod
+    def delete_datasource(db:Session, ds_name:str):
+        ''' Delete a datasource.\n
+        `db` (Session): Database access session.\n
+        `ds_name` (str): DataSource names.\n
+        `active` (bool): Activate state value.\n
+        return `ds_answer` (list): List of datasources in database.\n
+        '''
+        ds_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataSource)
+
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        if (ds is not None):
+            # Remove from database
+            db.delete(ds)
+            db.commit()
+            # Parse data
+            ds_answer[ds_name] = True
+        else:
+            ds_answer[ds_name] = False
+        
+        return (ds_answer)
+    # --------------------
+    

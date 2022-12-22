@@ -90,6 +90,10 @@ app.add_api_route("/datasource/{ds_name}",
     methods=["GET"], response_model=ds_schemas.dataSource,
     endpoint=ds_routes.get_datasource_by_name)
 
+app.add_api_route("/datasource/{ds_name}",
+    methods=["DELETE"], response_model=Dict[str,bool],
+    endpoint=ds_routes.del_datasource_by_name)
+
 app.add_api_route("/datasource/{ds_name}={active}",
     methods=["PUT"], response_model=Dict[str,bool],
     endpoint=ds_routes.change_datasource_active_status)

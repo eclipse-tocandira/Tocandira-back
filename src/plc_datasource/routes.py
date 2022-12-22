@@ -189,3 +189,19 @@ def get_datasources_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:s
 
     return(val_ds)
 # --------------------
+
+# --------------------
+def del_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+    ''' Delete the specified entry from database.\n
+    `ds_name` (str): DataSource name.\n
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    a HTTP_OK response.\n
+    '''
+    val_ds = Tdatasource.delete_datasource(db, ds_name)
+
+    if (val_ds is None):
+        m_name = f"Data Source"
+        raise HTTPException(status_code=404, detail=f"Error on {m_name} deletion.")
+
+    return(val_ds)
+# --------------------
