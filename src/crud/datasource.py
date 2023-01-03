@@ -78,7 +78,7 @@ class Tdatasource:
         # Tranlate protocol table to specific implementation
         prot_data = {}
         for prop, value in db_prot.__dict__.items():
-            if (not prop.startswith('_') and 'id' not in prop and 'name'!=prop):
+            if (not prop.startswith('_') and 'id'!=prop and 'datasource_name'!=prop and 'name'!=prop):
                 prot_data[prop] = value
 
         # Prepare answer
