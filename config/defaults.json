@@ -37,20 +37,29 @@
             "name":{"value":"Variable name"},
             "description":{"value":"Variable description"},
             "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
-            "address":{"value":"DB100.DBD818"}
+            "access":{
+                "address":{"value":"DB100.DBD818"}
+            },
+            "ds_name":{"value":"PLC name"}
         },
         "Rockwell":{
             "name":{"value":"Variable name"},
             "description":{"value":"Variable description"},
             "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
-            "tag_name":{"value":"FIX_ANALOG[32]"}
+            "access":{
+                "tag_name":{"value":"FIX_ANALOG[32]"}
+            },
+            "ds_name":{"value":"PLC name"}
         },
         "Modbus":{
             "name":{"value":"Variable name"},
             "description":{"value":"Variable description"},
             "num_type":{"value":"REAL","valid":["BOOL","INT","DINT","REAL"]},
-            "func_code":{"value":"4","valid":["","","",""]},
-            "address":{"value":"32004"}
+            "access":{
+                "func_code":{"value":"4 - HOLDING REGISTER","valid":["0 - COIL","1 - STATUS","3 - INPUT REGISTER","4 - HOLDING REGISTER"]},
+                "address":{"value":"32004"}
+            },
+            "ds_name":{"value":"PLC name"}
         }
     }
 }
