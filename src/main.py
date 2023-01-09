@@ -72,6 +72,10 @@ app.add_api_route("/datasource_defaults/{prot_name}",
     methods=["GET"], response_model=ds_schemas.dataSourceInfo,
     endpoint=ds_routes.get_datasource_defaults)
 
+app.add_api_route("/datapoint_defaults/{prot_name}",
+    methods=["GET"], response_model=dp_schemas.dataPointInfo,
+    endpoint=dp_routes.get_datapoint_defaults)
+
 ### Collector
 app.add_api_route("/collector",
     methods=["PUT"], response_model=col_schemas.collectorInfo,

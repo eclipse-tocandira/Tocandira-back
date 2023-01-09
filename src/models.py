@@ -42,6 +42,8 @@ class DataPoint(Base):
     description = Column(String)
     num_type = Column(String)
     access = Column(String, nullable=False)
+    active = Column(Boolean, default=True)
+    pending = Column(Boolean, default=True)
     # Other tables
     datasource = relationship("DataSource", back_populates="datapoints")# N to 1
     datasource_name = Column(Integer, ForeignKey("datasources.name"))
