@@ -125,3 +125,44 @@ app.add_api_route("/datasources/active",
 app.add_api_route("/datasource/{ds_name}/confirm",
     methods=["PUT"], response_model=Dict[str,bool],
     endpoint=ds_routes.confirm_datasources)
+
+### DataPoints
+app.add_api_route("/datapoint",
+    methods=["POST"], response_model=dp_schemas.dataPoint,
+    endpoint=dp_routes.create_datapoint)
+
+app.add_api_route("/datapoint",
+    methods=["PUT"], response_model=dp_schemas.dataPoint,
+    endpoint=dp_routes.update_datapoint)
+
+app.add_api_route("/datapoint/{dp_name}",
+    methods=["GET"], response_model=dp_schemas.dataPoint,
+    endpoint=dp_routes.get_datapoint_by_name)
+
+app.add_api_route("/datapoint/{dp_name}",
+    methods=["DELETE"], response_model=Dict[str,bool],
+    endpoint=dp_routes.del_datapoint_by_name)
+
+app.add_api_route("/datapoint/{dp_name}={active}",
+    methods=["PUT"], response_model=Dict[str,bool],
+    endpoint=dp_routes.change_datapoint_active_status)
+
+app.add_api_route("/datapoints",
+    methods=["GET"], response_model=List[dp_schemas.dataPoint],
+    endpoint=dp_routes.get_datapoints)
+
+app.add_api_route("/datapoints/range/{ini}-{end}",
+    methods=["GET"], response_model=List[dp_schemas.dataPoint],
+    endpoint=dp_routes.get_datapoints_by_range)
+
+app.add_api_route("/datapoints/pending",
+    methods=["GET"], response_model=List[dp_schemas.dataPoint],
+    endpoint=dp_routes.get_datapoints_pending)
+
+app.add_api_route("/datapoints/active",
+    methods=["GET"], response_model=List[dp_schemas.dataPoint],
+    endpoint=dp_routes.get_datapoints_active)
+
+app.add_api_route("/datapoint/{dp_name}/confirm",
+    methods=["PUT"], response_model=Dict[str,bool],
+    endpoint=dp_routes.confirm_datapoints)
