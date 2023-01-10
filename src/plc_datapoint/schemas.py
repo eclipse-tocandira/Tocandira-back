@@ -22,10 +22,10 @@ class dataPointInfo(BaseModel):
     name: str
     description: str
     num_type: str
-    ds_name: str
+    datasource_name: str
     access: accessInfo
 
 class dataPoint(dataPointInfo):
     active: bool
     pending: bool
-    datasource: ds_schemas.dataSource
+    # datasource: ds_schemas.dataSource

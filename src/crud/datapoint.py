@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 # Import custom libs
 from .. import models
+from .datasource import Tdatasource
 from ..env import Enviroment as Env
 from ..plc_datapoint import schemas
 from ..plc_datasource import schemas as ds_schemas
@@ -48,9 +49,342 @@ class Tdatapoint:
                 name=this_access['name']['value'],
                 description=this_access['description']['value'],
                 num_type=this_access['num_type']['value'],
-                ds_name=this_access['ds_name']['value'],
+                datasource_name=this_access['datasource_name']['value'],
                 access=schemas.accessInfo(name=prot_name,data=a_info)
             )
 
         return(info)
     # --------------------
+
+    # --------------------
+    @staticmethod
+    def _find_datasource(db:Session, ds_name:str):
+        ''' Search DB table for corresponding name.\n
+        `db` (Session): Database access session.\n
+        `ds_name` (str): Datasource table key.\n
+        return `ds` (models.Datasource): Corresponding Datasource table item.\n
+        '''
+        # Declare the query
+        dbq = db.query(models.DataSource)
+        # Get specific Datasource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        
+        return(ds)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def _get_datapoint_implementation(db:Session, gen_dp:models.DataPoint):
+        ''' Search DB table for corresponding name.\n
+        `db` (Session): Database access session.\n
+        `gen_dp` (models.DataPoint): Datapoint table item.\n
+        return `dp`: The Datapoint object but in the specific implementation.\n
+        '''
+        dp = None
+        p_name = gen_dp.access
+
+        if p_name in models.IMPLEMENTED_DATA.keys():
+            data_cls = models.IMPLEMENTED_DATA[p_name]
+            # Declare the query
+            dbq = db.query(data_cls)
+            # Get specific Datasource
+            dp = dbq.filter(data_cls.name == gen_dp.name).first()
+        
+
+        return(dp)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def _parse_datapoint(db_dp:models.DataPoint):
+        ''' Parde DB datapoint table item to corresponding schema.\n
+        `db_dp` (models.DataPoint): Datapoint table item.\n
+        return `dp` (schemas.dataPoint): Parsed datapoint information.\n
+        '''
+
+        # Search in attributes for implementation specific parameters
+        access_data = {}
+
+        for prop in db_dp.__dict__.keys():
+            if (not prop.startswith('_') and prop not in models.DataPoint.__dict__.keys()):
+                access_data[prop] = getattr(db_dp,prop)
+        
+        # Prepare answer
+        dp = schemas.dataPoint(
+            name=db_dp.name,
+            description=db_dp.description,
+            num_type=db_dp.num_type,
+            datasource_name=db_dp.datasource.name,
+            access=schemas.accessInfo(name=db_dp.access,data=access_data),
+            active=db_dp.active,
+            pending=db_dp.pending,
+            # datasource=ds_info
+        )
+
+        return(dp)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def create_datapoint(db: Session, new_dp: schemas.dataPointInfo):
+        ''' Create a new datapoint with the corresponding protocol
+        but without any datapoint associated with it.\n
+        `db` (Session): Database access session.\n
+        `new_dp` (schemas.dataPointInfo): Informations on the new
+        datapoint to create.\n
+        return `dp_created` (schemas.dataPoint): The created table item
+        information.\n
+        '''
+        dp_created = None
+
+        if new_dp.access.name in models.IMPLEMENTED_DATA.keys():
+
+            data_cls = models.IMPLEMENTED_DATA[new_dp.access.name]
+            ds = Tdatapoint._find_datasource(db,new_dp.datasource_name)
+                
+            if ds is not None:
+                # Instanciate DataPoint
+                db_dp = data_cls(
+                    name=new_dp.name,
+                    description=new_dp.description,
+                    num_type=new_dp.num_type,
+                    datasource=ds,
+                    **new_dp.access.data)
+
+                # Insert in database
+                db.add(db_dp)
+                db.commit()
+                db.refresh(db_dp)
+                
+                # Parse information
+                dp_created = Tdatapoint._parse_datapoint(db_dp)
+        
+        return(dp_created)
+    # --------------------
+
+    # --------------------
+    def update_datapoint(db: Session, dp_update: schemas.dataPointInfo):
+        ''' Search for a datapoints and update it's informations.\n
+        `db` (Session): Database access session.\n
+        `dp_update` (schemas.dataPointInfo): Informations on the new
+        datapoint to create.\n
+        return `dp_answer` (schemas.dataPoint): The modified datapoint.\n
+        '''
+        dp_answer = None
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_update.name).first()
+        if (dp is not None):
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+
+            # Update matching parameters in DataPoint
+            for param, value in dp.__dict__.items():
+                if (param in ['datasource','datasource_name','name','access']):
+                    continue
+                if param in dp_update.__dict__.keys():
+                    value = getattr(dp_update,param)
+                if param in dp_update.access.data.keys():
+                    value = dp_update.access.data[param]
+                setattr(dp,param,value)
+
+            # Parse data
+            dp_answer = Tdatapoint._parse_datapoint(dp)
+            
+            # Insert changes in database
+            db.commit()
+
+        return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datapoints(db:Session):
+        ''' Get all datapoints.\n
+        `db` (Session): Database access session.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = []
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get Datapoint list
+        for dp in dbq.all():
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            # Parse data
+            dp_answer.append( Tdatapoint._parse_datapoint(dp) )
+        
+        return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datapoints_by_range(db:Session, ini:int, end:int):
+        ''' Get all datapoints.\n
+        `db` (Session): Database access session.\n
+        `ini` (int): First query result to show.\n
+        `end` (int): Last query result to show.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = []
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get Datapoint list
+        for dp in dbq.offset(ini-1).limit(end).all():
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            # Parse data
+            dp_answer.append( Tdatapoint._parse_datapoint(dp) )
+
+        return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datapoints_pending(db:Session):
+        ''' Get all datapoints that are pending.\n
+        `db` (Session): Database access session.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = []
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get Datapoint list
+        for dp in dbq.filter(models.Datapoint.pending==True).all():
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            # Parse data
+            dp_answer.append( Tdatapoint._parse_datapoint(dp) )
+
+        return (dp_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def get_datapoints_active(db:Session):
+        ''' Get all datapoints that are active.\n
+        `db` (Session): Database access session.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = []
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get Datapoint list
+        for dp in dbq.filter(models.DataPoint.active==True).all():
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            # Parse data
+            dp_answer.append( Tdatapoint._parse_datapoint(dp) )
+        
+        return (dp_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def confirm_datapoint(db:Session, dp_name:str):
+        ''' Set specified datapoints to pending `False`.\n
+        `db` (Session): Database access session.\n
+        `dp_name` (str): DataPoint name.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_name).first()
+        if (dp is not None):
+            # Insert in database
+            dp.pending = False
+            db.commit()
+            # Parse data
+            dp_answer[dp_name] = True
+        else:
+            dp_answer[dp_name] = False
+            
+        return (dp_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def get_datapoint_by_name(db:Session, dp_name:str):
+        ''' Search datapoint by name.\n
+        `db` (Session): Database access session.\n
+        `dp_name` (str): DataPoint name.\n
+        return `dp_answer` (schemas.dataPoint): Datapoint found, `None` if
+        not found.\n
+        '''
+        dp_answer = None
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_name).first()
+        if (dp is not None):
+            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            # Parse data
+            dp_answer = Tdatapoint._parse_datapoint(dp)
+        
+        return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def activate_datapoint(db:Session, dp_name:str, active:bool):
+        ''' Set active state of a datapoint.\n
+        `db` (Session): Database access session.\n
+        `dp_name` (str): DataPoint names.\n
+        `active` (bool): Activate state value.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_name).first()
+        if (dp is not None):
+            # Insert in database
+            dp.active = active
+            db.commit()
+            # Parse data
+            dp_answer[dp_name] = True
+        else:
+            dp_answer[dp_name] = False
+        
+        return (dp_answer)
+    # --------------------
+    
+    # --------------------
+    @staticmethod
+    def delete_datapoint(db:Session, dp_name:str):
+        ''' Delete a datapoint.\n
+        `db` (Session): Database access session.\n
+        `dp_name` (str): DataPoint names.\n
+        `active` (bool): Activate state value.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_name).first()
+        if (dp is not None):
+            # Remove from database
+            db.delete(dp)
+            db.commit()
+            # Parse data
+            dp_answer[dp_name] = True
+        else:
+            dp_answer[dp_name] = False
+        
+        return (dp_answer)
+    # --------------------
+    
