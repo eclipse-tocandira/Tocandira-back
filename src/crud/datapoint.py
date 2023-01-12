@@ -386,3 +386,26 @@ class Tdatapoint:
         return (dp_answer)
     # --------------------
     
+    # --------------------
+    @staticmethod
+    def get_datapoints_from_datasource(db:Session, ds_name:str):
+        ''' Get all datapoints.\n
+        `db` (Session): Database access session.\n
+        `ds_name (str)`: DataSource name to search.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = []
+        # Declare the query
+        dbq = db.query(models.DataSource)
+        # Get DataSource
+        ds = dbq.filter(models.DataSource.name == ds_name).first()
+        
+        # Get Datapoint list
+        for dp in ds.datapoints:
+            # Get specific implementation of it
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
+            # Parse data
+            dp_answer.append( Tdatapoint._parse_datapoint(dp) )
+        
+        return (dp_answer)
+    # --------------------
