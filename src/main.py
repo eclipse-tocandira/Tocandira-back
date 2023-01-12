@@ -24,6 +24,7 @@ from .plc_datapoint import schemas as dp_schemas
 from .plc_datapoint import routes as dp_routes
 from .collector import schemas as col_schemas
 from .collector import routes as col_routes
+from .fboot_gen import routes as fboot_routes
 
 
 #######################################
@@ -166,3 +167,8 @@ app.add_api_route("/datapoints/active",
 app.add_api_route("/datapoint/{dp_name}/confirm",
     methods=["PUT"], response_model=Dict[str,bool],
     endpoint=dp_routes.confirm_datapoints)
+
+### ForteGateway
+app.add_api_route("/export",
+    methods=["POST"], response_model=bool,
+    endpoint=fboot_routes.export_gateway)

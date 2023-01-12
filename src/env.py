@@ -40,3 +40,18 @@ class Enviroment:
 
     CYCLETIME = os.getenv('CONF_CYCLETIME', default='5000')
     '''`CYCLETIME` (int): Gateway Read execution time'''
+
+    FBOOT_FILEURL = os.getenv('FBOOT_FILEURL', default='./forte.fboot')
+    '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
+    Forte fboot file. Default is `"./forte.fboot"`'''
+    
+    FBOOT_SSH_IP = os.getenv('FBOOT_SSH_IP', default='localhost')
+    '''`FBOOT_SSH_IP` (str): IP address to perform ssh connection if needed.
+    Default is `"localhost"`'''
+
+    FBOOT_SSH_PORT = os.getenv('FBOOT_SSH_PORT', default='22')
+    '''`FBOOT_SSH_PORT` (int): Port number for SSH connection.
+    Default is `22`'''
+
+    FBOOT_SSH_USERNAME = os.getenv('FBOOT_SSH_USERNAME', default=None)
+    '''`FBOOT_SSH_USERNAME` (str): Username for SSH connection.'''
