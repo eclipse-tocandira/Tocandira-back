@@ -41,6 +41,14 @@ class Enviroment:
     CYCLETIME = os.getenv('CONF_CYCLETIME', default='5000')
     '''`CYCLETIME` (int): Gateway Read execution time'''
 
+    OPCUA_FILEURL = os.getenv('OPCUA_FILEURL', default='./opcua_exporter.yml')
+    '''`OPCUA_FILEURL` (str): Local or Remote path to save the generated
+    OPCUA Exporter configuration file. Default is `"./opcua_exporter.yml"`'''
+    
+    OPCUA_ENDPOINT = os.getenv('OPCUA_ENDPOINT', default='opc.tcp://localhost:4840')
+    '''`OPCUA_ENDPOINT` (str): The endpoint address to connect the
+    exporter to. Default is `"opc.tcp://localhost:4840"`'''
+    
     FBOOT_FILEURL = os.getenv('FBOOT_FILEURL', default='./forte.fboot')
     '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
     Forte fboot file. Default is `"./forte.fboot"`'''

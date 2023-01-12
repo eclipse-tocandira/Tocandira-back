@@ -6,13 +6,16 @@ Copyright (c) 2017 Aimirim STI.\n
 * fastapi
 * sqlalchemy
 * pyfboot
+* fsspec
+* pyyaml
 '''
 
 # Import system libs
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from pyfboot.gateway import MonoGatewayProject
-
+import fsspec
+import yaml
 
 # Import custom libs
 from ..database import get_db
@@ -35,6 +38,9 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
     # Create the 4diac Gateway Project
     prj_4diac = MonoGatewayProject(cycle_time=int(Env.CYCLETIME))
 
+    # Create OPCUA configuration file
+    opcua_conf = { 'endPoint':Env.OPCUA_ENDPOINT, 'nodes':[] }
+
     try:
         # Get active datasources
         ds_list = Tdatasource.get_datasources_active(db)
@@ -52,16 +58,40 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
                     # Create communication blocks and associate them with an OPC variable
                     comFB = prj_4diac.build_comm_block(ds.dict(),dp.dict())
                     prj_4diac.addVariable(dp.name,comFB)
+                    # Create corresponding Node on OPCUA
+                    opcua_conf['nodes'].append({
+                        'nodeName':f'ns={1};s={dp.name}',
+                        'metricName':f'{dp.name}',
+                        'metricHelp':f'{dp.description}'
+                    })
 
-        # Write project
-        if Env.FBOOT_SSH_IP=='localhost':
-            # Locally
+        # Insert one more node with the pre-defined observability variable
+        opcua_conf['nodes'].append({
+            'nodeName':'ns=1;s=_ForteCycleTime',
+            'metricName':'_ForteCycleTime',
+            'metricHelp':'Tempo de leitura das variavies do Forte'
+        })
+
+        protocol, _ = fsspec.core.split_protocol(Env.OPCUA_FILEURL)
+
+        if protocol=='file':
+            # Write Forte project
             prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True)
+            # Write OPC configuration
+            with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8") as fid:
+                dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
+                fid.write( dump )
+
         else:
-            # Over SSH
+            # Write Forte project remote
             prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True,
                 host=Env.FBOOT_SSH_IP, port=int(Env.FBOOT_SSH_PORT),
                 username=Env.FBOOT_SSH_USERNAME)
+            # Write OPC configuration remote
+            with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8", host=Env.FBOOT_SSH_IP, 
+                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
+                dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
+                fid.write( dump )
 
         # Return Status
         res = True
