@@ -74,23 +74,21 @@ class Tdatapoint:
 
     # --------------------
     @staticmethod
-    def _get_datapoint_implementation(db:Session, gen_dp:models.DataPoint):
+    def _get_datapoint_implementation(db:Session, p_name:str, dp_name:str):
         ''' Search DB table for corresponding name.\n
         `db` (Session): Database access session.\n
         `gen_dp` (models.DataPoint): Datapoint table item.\n
         return `dp`: The Datapoint object but in the specific implementation.\n
         '''
         dp = None
-        p_name = gen_dp.access
 
         if p_name in models.IMPLEMENTED_DATA.keys():
             data_cls = models.IMPLEMENTED_DATA[p_name]
             # Declare the query
             dbq = db.query(data_cls)
             # Get specific Datasource
-            dp = dbq.filter(data_cls.name == gen_dp.name).first()
+            dp = dbq.filter(data_cls.name == dp_name).first()
         
-
         return(dp)
     # --------------------
 
@@ -178,7 +176,7 @@ class Tdatapoint:
         # Get specific Datapoint
         dp = dbq.filter(models.DataPoint.name == dp_update.name).first()
         if (dp is not None):
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
 
             # Update matching parameters in DataPoint
             for param, value in dp.__dict__.items():
@@ -212,7 +210,7 @@ class Tdatapoint:
 
         # Get Datapoint list
         for dp in dbq.all():
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
         
@@ -234,7 +232,7 @@ class Tdatapoint:
 
         # Get Datapoint list
         for dp in dbq.offset(ini-1).limit(end).all():
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
 
@@ -254,7 +252,7 @@ class Tdatapoint:
 
         # Get Datapoint list
         for dp in dbq.filter(models.Datapoint.pending==True).all():
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
 
@@ -274,7 +272,7 @@ class Tdatapoint:
 
         # Get Datapoint list
         for dp in dbq.filter(models.DataPoint.active==True).all():
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
         
@@ -325,7 +323,7 @@ class Tdatapoint:
         # Get specific Datapoint
         dp = dbq.filter(models.DataPoint.name == dp_name).first()
         if (dp is not None):
-            dp = Tdatapoint._get_datapoint_implementation(db,dp)
+            dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer = Tdatapoint._parse_datapoint(dp)
         
