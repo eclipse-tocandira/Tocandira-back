@@ -25,6 +25,8 @@ from .plc_datapoint import routes as dp_routes
 from .collector import schemas as col_schemas
 from .collector import routes as col_routes
 from .fboot_gen import routes as fboot_routes
+from .com_test import schemas as com_schemas
+from .com_test import routes as com_routes
 
 
 #######################################
@@ -172,3 +174,8 @@ app.add_api_route("/datapoint/{dp_name}/confirm",
 app.add_api_route("/export",
     methods=["POST"], response_model=bool,
     endpoint=fboot_routes.export_gateway)
+
+### Communication Tests
+app.add_api_route("/test/{dp_name}",
+    methods=["POST"], response_model=com_schemas.comTest,
+    endpoint=com_routes.test_plc_connection)

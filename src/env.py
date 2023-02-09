@@ -49,6 +49,10 @@ class Enviroment:
     '''`OPCUA_ENDPOINT` (str): The endpoint address to connect the
     exporter to. Default is `"opc.tcp://localhost:4840"`'''
     
+    OPCUA_TESTER_ENDPOINT = os.getenv('OPCUA_TESTER_ENDPOINT', default='opc.tcp://localhost:4900')
+    '''`OPCUA_ENDPOINT` (str): The endpoint address to connect the
+    exporter to. Default is `"opc.tcp://localhost:4900"`'''
+
     FBOOT_FILEURL = os.getenv('FBOOT_FILEURL', default='./forte.fboot')
     '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
     Forte fboot file. Default is `"./forte.fboot"`'''
