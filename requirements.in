@@ -1,5 +1,12 @@
 fastapi
 SQLAlchemy
 uvicorn
-typing-extensions
 pydantic
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
+pyyaml
+fsspec>=2021.4
+paramiko
+opcua
+git+ssh://git@aimirimsti.ddns.net:3022/application_eng/data-collector/pyfboot.git@v0.1.0
