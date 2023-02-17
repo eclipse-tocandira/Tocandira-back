@@ -48,7 +48,7 @@ class Tdatapoint:
             info = schemas.dataPointInfo(
                 name=this_access['name']['value'],
                 description=this_access['description']['value'],
-                num_type=this_access['num_type']['value'],
+                num_type=ds_schemas.comboBox(defaultValue=this_access['num_type']['value'],menuItems=this_access['num_type']['valid']),
                 datasource_name=this_access['datasource_name']['value'],
                 access=schemas.accessInfo(name=prot_name,data=a_info)
             )

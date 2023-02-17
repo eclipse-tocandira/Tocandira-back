@@ -8,6 +8,7 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 from pydantic import BaseModel
+from typing import Any
 
 # Import custom libs
 from ..plc_datasource import schemas as ds_schemas
@@ -21,7 +22,7 @@ class accessInfo(BaseModel):
 class dataPointInfo(BaseModel):
     name: str
     description: str
-    num_type: str
+    num_type: Any
     datasource_name: str
     access: accessInfo
 
