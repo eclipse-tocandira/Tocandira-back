@@ -189,13 +189,13 @@ def get_datapoints_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:st
 # --------------------
 
 # --------------------
-def del_datapoint_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+def del_datapoint_by_name(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Delete the specified entry from database.\n
     `ds_name` (str): DataPoint name.\n
     return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
     a HTTP_OK response.\n
     '''
-    val_dp = Tdatapoint.delete_datapoint(db, ds_name)
+    val_dp = Tdatapoint.delete_datapoint(db, dp_name)
 
     if (val_dp is None):
         m_name = f"Data Point"
