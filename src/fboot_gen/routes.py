@@ -45,13 +45,16 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
         # Get active datasources
         ds_list = Tdatasource.get_datasources_active(db)
         for ds in ds_list:
-
+            # Filter datasources for confirmed ones
+            if ds.pending:
+                continue
+            
             # Get the datapoints from this datasource
             dp_list = Tdatapoint.get_datapoints_from_datasource(db,ds.name)
             for dp in dp_list:
                 
                 # Filter datapoints for active ones
-                if dp.active:
+                if dp.active and not dp.pending:
                     # Get specific informations
                     dp = Tdatapoint._get_datapoint_implementation(db,dp.access.name,dp.name)
                     dp = Tdatapoint._parse_datapoint(dp)
