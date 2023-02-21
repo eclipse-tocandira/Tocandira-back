@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 
 # Import custom libs
 from .. import models
-from .datasource import Tdatasource
 from ..env import Enviroment as Env
 from ..plc_datapoint import schemas
 from ..plc_datasource import schemas as ds_schemas

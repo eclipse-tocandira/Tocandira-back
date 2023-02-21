@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..env import Enviroment as Env
 from ..plc_datasource import schemas
+from .datapoint import Tdatapoint
 
 
 #######################################
@@ -420,6 +421,10 @@ class Tdatasource:
         # Get specific Datasource
         ds = dbq.filter(models.DataSource.name == ds_name).first()
         if (ds is not None):
+            ds_list = Tdatapoint.get_datapoints_from_datasource(db,ds.name)
+            for dp in ds_list:
+                Tdatapoint.delete_datapoint(db,dp.name)
+
             # Remove from database
             db.delete(ds)
             db.commit()
