@@ -23,6 +23,7 @@ from ..env import Enviroment as Env
 from ..user_auth import routes as usr_routes
 from ..crud.datapoint import Tdatapoint
 from ..crud.datasource import Tdatasource
+from ..crud.collector import Tcollector
 
 #######################################
 
@@ -35,11 +36,14 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
     '''
     res = False
 
+    val_col = Tcollector.get_by_id(db,id=1)
+    parsed_col = Tcollector._parse_collector(val_col)
+
     # Create the 4diac Gateway Project
     prj_4diac = MonoGatewayProject(cycle_time=int(Env.CYCLETIME))
 
     # Create OPCUA configuration file
-    opcua_conf = { 'endPoint':Env.OPCUA_ENDPOINT, 'nodes':[] }
+    opcua_conf = { 'endPoint':f'opc.tcp://{parsed_col.ip}:{parsed_col.port}', 'nodes':[] }
 
     try:
         # Get active datasources
@@ -101,7 +105,7 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
 
     except Exception as exc:
         msg = str(exc).split('\n')[0]
-        msg = f'Unexpected Error Found: "{msg}"'
+        msg = f'Export Error: "{msg}"'
         raise HTTPException(status_code=520, detail=msg)
 
     return(res)
