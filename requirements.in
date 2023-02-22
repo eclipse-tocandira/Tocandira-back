@@ -9,4 +9,4 @@ pyyaml
 fsspec>=2021.4
 paramiko
 opcua
-git+ssh://git@aimirimsti.ddns.net:3022/application_eng/data-collector/pyfboot.git@v0.1.2
+git+https://github.com/Aimirim-STI/pyfboot@v0.2.0
