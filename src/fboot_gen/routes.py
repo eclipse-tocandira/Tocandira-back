@@ -88,6 +88,16 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
             with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8") as fid:
                 dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
                 fid.write( dump )
+            # Read Prometheus File
+            with fsspec.open(Env.PROMETHEUS_FILEURL, 'r') as fid:
+                prometheus_conf = yaml.safe_load(fid)
+            # Change values
+            prometheus_conf['global']['scrape_interval'] = f"{parsed_col.update_period}s"
+            prometheus_conf['global']['evaluation_interval'] = f"{parsed_col.update_period}s"
+            # Save Prometheus File
+            with fsspec.open(Env.PROMETHEUS_FILEURL, 'w', encoding = "utf-8") as fid:
+                p_dump = yaml.dump(prometheus_conf, allow_unicode=True, encoding=None, default_flow_style=False)
+                fid.write( p_dump )
 
         else:
             # Write Forte project remote
@@ -99,6 +109,18 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
                 port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
                 dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
                 fid.write( dump )
+            # Read Prometheus File
+            with fsspec.open(Env.PROMETHEUS_FILEURL, 'r', host=Env.FBOOT_SSH_IP, 
+                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
+                prometheus_conf = yaml.safe_load(fid)
+            # Change values
+            prometheus_conf['global']['scrape_interval'] = f"{parsed_col.update_period}s"
+            prometheus_conf['global']['evaluation_interval'] = f"{parsed_col.update_period}s"
+            # Save Prometheus File
+            with fsspec.open(Env.PROMETHEUS_FILEURL, 'w', encoding = "utf-8", host=Env.FBOOT_SSH_IP, 
+                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
+                p_dump = yaml.dump(prometheus_conf, allow_unicode=True, encoding=None, default_flow_style=False)
+                fid.write( p_dump )
 
         # Return Status
         res = True
