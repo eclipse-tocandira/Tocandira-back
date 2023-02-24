@@ -109,7 +109,11 @@ def test_plc_connection(dp_name:str, db:Session=Depends(get_db), usr:str=Depends
     fbclass = PROTOCOL_TYPELIBRARY_MAPPING[prot]
 
     # Initialize the FB to parse parameters
-    fb = fbclass(ds.timeout)
+
+    # NOTE: The ds.timeout will not be used because the
+    #       opc method timeout is 4s. Therefore this
+    #       connection timeout should be smaller.
+    fb = fbclass(timeout=1000)
     fb.parse_params(ds.dict(),dp.dict())
     # Get the communication string
     comm_str = fb.get_comm_string()
