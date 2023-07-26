@@ -114,7 +114,11 @@ def test_plc_connection(dp_name:str, db:Session=Depends(get_db), usr:str=Depends
     #       opc method timeout is 4s. Therefore this
     #       connection timeout should be smaller.
     fb = fbclass(timeout=1000)
-    fb.parse_params(ds.dict(),dp.dict())
+    
+    dpd = dp.dict()
+    if 'func_code' in dpd['access']['data'].keys():
+        dpd['access']['data']['func_code'] = int(dpd['access']['data']['func_code'].split('-')[0])
+    fb.parse_params(ds.dict(),dpd)
     # Get the communication string
     comm_str = fb.get_comm_string()
     # Build the method name to CALL
