@@ -1,4 +1,4 @@
-FROM python:3.9.15-alpine3.16
+FROM python:3.11-alpine3.18
 
 WORKDIR /code
 RUN apk add --no-cache gcc g++ musl-dev git
@@ -17,7 +17,7 @@ USER back
 ENV PATH /home/back/.local/bin:$PATH
 
 COPY requirements.txt /code/requirements.txt
-
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 RUN mkdir -p /code/db
