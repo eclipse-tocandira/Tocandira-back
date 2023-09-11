@@ -20,9 +20,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    password = Column(String)
-    is_admin = Column(Boolean, default=True)
+    name = Column(String, index=True, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    change_password = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
 
 class Collector(Base):
     __tablename__ = "collector"
