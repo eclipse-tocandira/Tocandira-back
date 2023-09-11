@@ -46,7 +46,8 @@ app.add_middleware(
 with SessionManager() as db:
     # Check for users and create a default one if empty
     if (len(Tuser.get_all(db))==0):
-        admin_usr = auth_schemas.UserCreate(name='admin', password='admin')
+        admin_usr = auth_schemas.UserCreate(name='admin', password='admin',
+            change_password=True, is_admin=True)
         Tuser.create(db,admin_usr)
 
     # Check for Collector information and create a default one if empty
@@ -179,3 +180,20 @@ app.add_api_route("/export",
 app.add_api_route("/test/{dp_name}",
     methods=["POST"], response_model=com_schemas.comTest,
     endpoint=com_routes.test_plc_connection)
+
+### User Management
+app.add_api_route("/user",
+    methods=["POST"], response_model=auth_schemas.User,
+    endpoint=auth_routes.create_user)
+
+app.add_api_route("/user/password",
+    methods=["PUT"], response_model=bool,
+    endpoint=auth_routes.change_password)
+
+app.add_api_route("/user/{username}",
+    methods=["DELETE"], response_model=bool,
+    endpoint=auth_routes.delete_user)
+
+app.add_api_route("/users",
+    methods=["GET"], response_model=List[auth_schemas.User],
+    endpoint=auth_routes.get_user_list)
