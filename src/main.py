@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import custom libs
+from . import AppInfo
 from . import database
 from .env import Enviroment as Env
 from .crud import Tuser, Tcollector
@@ -33,7 +34,7 @@ from .com_test import routes as com_routes
 
 database.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(root_path=f"{Env.API_NAME}")
+app = FastAPI(root_path=f"{Env.API_NAME}", **AppInfo.__dict__)
 
 app.add_middleware(
     CORSMiddleware,
