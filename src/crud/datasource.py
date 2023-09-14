@@ -240,6 +240,13 @@ class Tdatasource:
                     value = ds_update.protocol.data[param]
                 setattr(prot,param,value)
 
+            # Set validation to False and include all datapoins in it
+            ds.pending = True
+            dp_list = Tdatapoint.get_datapoints_from_datasource(db,ds.name)
+            for dp in dp_list:
+                # The pending state is set internaly uppon update call
+                _ = Tdatapoint.update_datapoint(db,dp)
+
             # Parse data
             ds_answer = Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot))
             

@@ -187,6 +187,8 @@ class Tdatapoint:
                     value = dp_update.access.data[param]
                 setattr(dp,param,value)
 
+            # Set validation to False 
+            dp.pending = True
             # Parse data
             dp_answer = Tdatapoint._parse_datapoint(dp)
             
