@@ -130,7 +130,7 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
     prj_4diac = MonoGatewayProject(cycle_time=int(Env.CYCLETIME))
 
     # Create OPCUA configuration file
-    opcua_conf = { 'endPoint':f'opc.tcp://{parsed_col.ip}:{Env.OPCUA_SERVER_PORT}', 'nodes':[] }
+    opcua_conf = { 'endPoint':f'opc.tcp://forte_server:4840', 'nodes':[] }
 
     try:
         # Get active datasources

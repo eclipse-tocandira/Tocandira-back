@@ -52,8 +52,5 @@ class Enviroment:
     '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
     Forte fboot file. Default is `"./forte.fboot"`'''
     
-    OPCUA_SERVER_PORT = os.getenv('OPCUA_SERVER_PORT', default='4800')
-    '''`OPCUA_SERVER_PORT` (str): The OpcUA server port on forte project. Default is `"4800"`'''
-
     OPCUA_TESTER_PORT = os.getenv('OPCUA_TESTER_PORT', default='4900')
     '''`OPCUA_TESTER_PORT` (str): The OpcUA tester port on forte project. Default is `"4900"`'''
