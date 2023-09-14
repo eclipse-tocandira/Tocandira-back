@@ -21,6 +21,7 @@ from ..env import Enviroment as Env
 from ..database import get_db
 from ..crud.datapoint import Tdatapoint
 from ..crud.datasource import Tdatasource
+from ..crud.collector import Tcollector
 from ..user_auth import routes as usr_routes
 
 
@@ -60,8 +61,9 @@ def _parse_opc_response(res:list):
 # --------------------
 
 # --------------------
-def _test_server_connect(function:str,param:str):
+def _test_server_connect(endpoint:str,function:str,param:str):
     ''' Conect to the OPC-UA Test server and executes a function.\n
+    `endpoint` (str): The connection endpoint.\n
     `function` (str): The function name to call in OPC-UA.\n
     `param` (str): The parameter to pass to the function.\n
     return `response` (list): The function results.\n
@@ -72,7 +74,7 @@ def _test_server_connect(function:str,param:str):
     # Open the connection with OPC-UA
     try:
         # Insert parameters
-        opc_client = Client(Env.OPCUA_TESTER_ENDPOINT)
+        opc_client = Client(endpoint)
         # Open
         opc_client.connect()
         opc_objects = opc_client.get_objects_node()
@@ -93,7 +95,7 @@ def _test_server_connect(function:str,param:str):
 def test_plc_connection(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Test the connection of a specific datapoint.\n
     `dp_name` (str): DataPoint name.\n
-    return `res` (JSONResponse): A `schemas.comTest` automatically parser into
+    return `res` (JSONResponse): A `schemas.comTest` automatically parsed into
     a HTTP_OK response.\n
     '''
     # Get informations on point and source
@@ -107,6 +109,8 @@ def test_plc_connection(dp_name:str, db:Session=Depends(get_db), usr:str=Depends
     # Get the protocol function block class
     prot = ds.protocol.name
     fbclass = PROTOCOL_TYPELIBRARY_MAPPING[prot]
+    # Get the collector information
+    col = Tcollector.get_by_id(db,ds.collector_id)
 
     # Initialize the FB to parse parameters
 
@@ -125,7 +129,7 @@ def test_plc_connection(dp_name:str, db:Session=Depends(get_db), usr:str=Depends
     method_name = '1:Test' + prot + dp.num_type.upper()
 
     # Call the test server to check
-    opc_response = _test_server_connect(method_name, comm_str)
+    opc_response = _test_server_connect(f"opc.tcp://{col.ip}:{Env.OPCUA_TESTER_PORT}", method_name, comm_str)
     # Parse the response
     response = _parse_opc_response(opc_response)
     

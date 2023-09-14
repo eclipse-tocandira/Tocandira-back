@@ -61,5 +61,21 @@
             },
             "datasource_name":{"value":"PLC name"}
         }
+    },
+    "Collector": {
+        "name":"Collector Name",
+        "ip":"127.0.0.1",
+        "ssh_port":"22",
+        "ssh_user":"",
+        "opcua_port":"9686",
+        "health_port":"9100",
+        "update_period":"30"
+    },
+    "Prometheus": {
+        "global":{
+            "scrape_interval":"20s",
+            "evaluation_interval":"20s"
+        },
+        "scrape_configs":[]
     }
 }

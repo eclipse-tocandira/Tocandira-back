@@ -62,6 +62,7 @@ class Tdatasource:
                 plc_port=int(this_prot['plc_port']['value']),
                 cycletime=int(Env.CYCLETIME),
                 timeout=int(this_prot['timeout']['value']),
+                collector_id=0,
                 protocol=schemas.protocolInfo(name=prot_name, data=p_info)
             )
 
@@ -107,6 +108,7 @@ class Tdatasource:
             plc_port=db_ds.plc_port,
             cycletime=db_ds.cycletime,
             timeout=db_ds.timeout,
+            collector_id=db_ds.collector.id,
             active=db_ds.active,
             pending=db_ds.pending,
             protocol=prot
@@ -183,10 +185,14 @@ class Tdatasource:
 
         if new_ds.protocol.name in models.IMPLEMENTED_PROT.keys():
 
+            # Get collector info
+            qry = db.query(models.Collector)
+            col = qry.filter(models.Collector.id == new_ds.collector_id).first()
+
             # Instanciate DataSource
             db_ds = models.DataSource( name=new_ds.name,
                 plc_ip=new_ds.plc_ip, plc_port=new_ds.plc_port,
-                cycletime=new_ds.cycletime, timeout=new_ds.timeout)
+                cycletime=new_ds.cycletime, timeout=new_ds.timeout, collector=col)
 
             # Insert in database
             db.add(db_ds)
@@ -436,3 +442,23 @@ class Tdatasource:
         return (ds_answer)
     # --------------------
     
+    # --------------------
+    @staticmethod
+    def get_datasources_from_collector(db:Session, id:int):
+        ''' Get all datasources associated with a given collector\n
+        `db` (Session): Database access session.\n
+        `id` (int): Collector id to search for.\n
+        return `ds_answer` (list): List of datasources.\n
+        '''
+        ds_answer = []
+
+        qry = db.query(models.Collector)
+        col = qry.filter(models.Collector.id == id).first()
+
+        for ds in col.datasources:
+            prot = Tdatasource._find_datasource_prototol(db,ds)
+            # Parse data
+            ds_answer.append( Tdatasource._parse_datasource(ds, Tdatasource._parse_protocol(prot)) )
+        
+        return(ds_answer)
+    # --------------------

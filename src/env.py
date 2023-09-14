@@ -39,7 +39,6 @@ class Enviroment:
     '''`DEFAULTS` (json): Loaded Defaults from DEFAULT_FILE'''
 
     CYCLETIME = os.getenv('CONF_CYCLETIME', default='5000')
-    '''`CYCLETIME` (int): Gateway Read execution time'''
 
     OPCUA_FILEURL = os.getenv('OPCUA_FILEURL', default='./opcua_exporter.yml')
     '''`OPCUA_FILEURL` (str): Local or Remote path to save the generated
@@ -48,22 +47,13 @@ class Enviroment:
     PROMETHEUS_FILEURL = os.getenv('PROMETHEUS_FILEURL', default='./prometheus.yml')
     '''`PROMETHEUS_FILEURL` (str): Local or Remote path to save the modified
     configuration file for prometheus. Default is `"./prometheus.yml"`'''
-    
-    OPCUA_TESTER_ENDPOINT = os.getenv('OPCUA_TESTER_ENDPOINT', default='opc.tcp://localhost:4900')
-    '''`OPCUA_TESTER_ENDPOINT` (str): The endpoint address to connect the
-    test request to. Default is `"opc.tcp://localhost:4900"`'''
 
     FBOOT_FILEURL = os.getenv('FBOOT_FILEURL', default='./forte.fboot')
     '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
     Forte fboot file. Default is `"./forte.fboot"`'''
     
-    FBOOT_SSH_IP = os.getenv('FBOOT_SSH_IP', default='localhost')
-    '''`FBOOT_SSH_IP` (str): IP address to perform ssh connection if needed.
-    Default is `"localhost"`'''
+    OPCUA_SERVER_PORT = os.getenv('OPCUA_SERVER_PORT', default='4800')
+    '''`OPCUA_SERVER_PORT` (str): The OpcUA server port on forte project. Default is `"4800"`'''
 
-    FBOOT_SSH_PORT = os.getenv('FBOOT_SSH_PORT', default='22')
-    '''`FBOOT_SSH_PORT` (int): Port number for SSH connection.
-    Default is `22`'''
-
-    FBOOT_SSH_USERNAME = os.getenv('FBOOT_SSH_USERNAME', default=None)
-    '''`FBOOT_SSH_USERNAME` (str): Username for SSH connection.'''
+    OPCUA_TESTER_PORT = os.getenv('OPCUA_TESTER_PORT', default='4900')
+    '''`OPCUA_TESTER_PORT` (str): The OpcUA tester port on forte project. Default is `"4900"`'''
