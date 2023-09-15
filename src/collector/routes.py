@@ -73,9 +73,9 @@ def update_collector(id:int,collector:schemas.collectorCreate, db:Session=Depend
         m_name = f"Collector data"
         raise HTTPException(status_code=404, detail=f"Error updating {m_name}.")
 
-    prom_conf = fb_routes._update_prometheus_conf(parsed_old,parsed_col)
+    prom_conf = fb_routes._update_prometheus_conf(parsed_old,val_col)
     try:
-        fb_routes._write_prometheus_file(parsed_col,prom_conf)
+        fb_routes._write_prometheus_file(val_col,prom_conf)
     except:
         raise HTTPException(status_code=404, detail=f"Error updating Collector from Prometheus file.")
 
@@ -96,9 +96,9 @@ def new_collector(collector:schemas.collectorCreate, db:Session=Depends(get_db),
         raise HTTPException(status_code=404, detail=f"Error Creating {m_name}.")
 
     parsed_col = Tcollector._parse_collector(val_col)
-    prom_conf = fb_routes._update_prometheus_conf(parsed_col,parsed_col)
+    prom_conf = fb_routes._update_prometheus_conf(parsed_col,val_col)
     try:
-        fb_routes._write_prometheus_file(parsed_col,prom_conf)
+        fb_routes._write_prometheus_file(val_col,prom_conf)
     except:
         raise HTTPException(status_code=404, detail=f"Error updating Collector from Prometheus file.")
 
@@ -244,9 +244,9 @@ def del_collector(id:int, db:Session=Depends(get_db), usr:str=Depends(usr_routes
 
     if (ans[id]):
         parsed_col = Tcollector._parse_collector(col)
-        prom_conf = fb_routes._delete_prometheus_conf(parsed_col)
+        prom_conf = fb_routes._delete_prometheus_conf(col)
         try:
-            fb_routes._write_prometheus_file(parsed_col,prom_conf)
+            fb_routes._write_prometheus_file(col,prom_conf)
         except:
             raise HTTPException(status_code=404, detail=f"Error removing Collector from Prometheus file.")
 
