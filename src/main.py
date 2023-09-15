@@ -12,9 +12,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import custom libs
+from . import AppInfo
 from . import database
 from .env import Enviroment as Env
-from .crud import Tuser, Tcollector
+from .crud import Tuser
 from .database import SessionManager, engine
 from .user_auth import schemas as auth_schemas
 from .user_auth import routes as auth_routes
@@ -33,7 +34,7 @@ from .com_test import routes as com_routes
 
 database.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(root_path=f"{Env.API_NAME}")
+app = FastAPI(root_path=f"{Env.API_NAME}", **AppInfo.__dict__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,15 +47,9 @@ app.add_middleware(
 with SessionManager() as db:
     # Check for users and create a default one if empty
     if (len(Tuser.get_all(db))==0):
-        admin_usr = auth_schemas.UserCreate(name='admin', password='admin')
+        admin_usr = auth_schemas.UserCreate(name='admin', password='admin',
+            change_password=True, is_admin=True)
         Tuser.create(db,admin_usr)
-
-    # Check for Collector information and create a default one if empty
-    if (len(Tcollector.get_all(db))==0):
-        col_data = col_schemas.collectorInfo(ip='127.0.0.1', port=4840,
-            update_period=30, timeout=30)
-        Tcollector.create(db,col_data)
-
 
 # Application Routes 
 
@@ -79,14 +74,42 @@ app.add_api_route("/datapoint_defaults/{prot_name}",
     methods=["GET"], response_model=dp_schemas.dataPointInfo,
     endpoint=dp_routes.get_datapoint_defaults)
 
+app.add_api_route("/collector_defaults",
+    methods=["GET"], response_model=col_schemas.collectorInfo,
+    endpoint=col_routes.get_collector_defaults)
+
 ### Collector
-app.add_api_route("/collector",
-    methods=["PUT"], response_model=col_schemas.collectorInfo,
+app.add_api_route("/collector/{id}",
+    methods=["PUT"], response_model=col_schemas.collector,
     endpoint=col_routes.update_collector)
 
-app.add_api_route("/collector",
-    methods=["GET"], response_model=col_schemas.collectorInfo,
+app.add_api_route("/collector/{id}",
+    methods=["GET"], response_model=col_schemas.collector,
     endpoint=col_routes.get_collector)
+
+app.add_api_route("/collector/{id}/status",
+    methods=["GET"], response_model=col_schemas.collectorStatus,
+    endpoint=col_routes.check_collector_status)
+
+app.add_api_route("/collector/{id}/check",
+    methods=["GET"], response_model=col_schemas.collector,
+    endpoint=col_routes.check_collector_access)
+
+app.add_api_route("/collector/{id}",
+    methods=["DELETE"], response_model=Dict[int,bool],
+    endpoint=col_routes.del_collector)
+
+app.add_api_route("/collector",
+    methods=["POST"], response_model=col_schemas.collector,
+    endpoint=col_routes.new_collector)
+
+app.add_api_route("/collectors",
+    methods=["GET"], response_model=List[col_schemas.collector],
+    endpoint=col_routes.get_all_collectors)
+
+app.add_api_route("/collectors/status",
+    methods=["GET"], response_model=List[col_schemas.collectorStatus],
+    endpoint=col_routes.check_collectors_status)
 
 ### DataSources
 app.add_api_route("/datasource",
@@ -171,7 +194,7 @@ app.add_api_route("/datapoint/{dp_name}/confirm",
     endpoint=dp_routes.confirm_datapoints)
 
 ### ForteGateway
-app.add_api_route("/export",
+app.add_api_route("/export/collector/{id}",
     methods=["POST"], response_model=bool,
     endpoint=fboot_routes.export_gateway)
 
@@ -179,3 +202,20 @@ app.add_api_route("/export",
 app.add_api_route("/test/{dp_name}",
     methods=["POST"], response_model=com_schemas.comTest,
     endpoint=com_routes.test_plc_connection)
+
+### User Management
+app.add_api_route("/user",
+    methods=["POST"], response_model=auth_schemas.User,
+    endpoint=auth_routes.create_user)
+
+app.add_api_route("/user/password",
+    methods=["PUT"], response_model=bool,
+    endpoint=auth_routes.change_password)
+
+app.add_api_route("/user/{username}",
+    methods=["DELETE"], response_model=bool,
+    endpoint=auth_routes.delete_user)
+
+app.add_api_route("/users",
+    methods=["GET"], response_model=List[auth_schemas.User],
+    endpoint=auth_routes.get_user_list)

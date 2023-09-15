@@ -14,6 +14,7 @@ Copyright (c) 2017 Aimirim STI.\n
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from pyfboot.gateway import MonoGatewayProject
+from pydantic.utils import deep_update
 import fsspec
 import yaml
 
@@ -27,28 +28,118 @@ from ..crud.collector import Tcollector
 
 #######################################
 
+# --------------------
+def _update_prometheus_conf(old,parsed_col):
+    ''' Load the existing Prometheus configuration and update it.\n
+    `parsed_col` (schema.collector): The collector information.\n
+    return `prometheus_conf` (dict): The `prometheus.yml` file updated for
+    this collector.\n
+    '''
+
+    prometheus_conf = Env.DEFAULTS['Prometheus']
+    
+    # Read existing Prometheus File
+    try:
+        with fsspec.open(Env.PROMETHEUS_FILEURL, 'r', host=parsed_col.ip, 
+            port=int(parsed_col.ssh_port), username=parsed_col.ssh_user) as fid:
+            prometheus_conf_r = yaml.safe_load(fid)
+        prometheus_conf = deep_update(prometheus_conf,prometheus_conf_r)
+    except:
+        pass
+
+    # Search for existing configuration
+    exporter_id = -1
+    for i,conf in enumerate(prometheus_conf['scrape_configs']):
+        if(old!=None):
+            if( conf['job_name']==old.name ):
+                exporter_id = i
+    
+    # Write data into correct format
+    ex_data = { 'job_name': parsed_col.name,
+        'scrape_interval': f"{parsed_col.update_period}s", 
+        'static_configs':[{'labels':{'group':parsed_col.name},'targets': 
+        [f"{parsed_col.ip}:{parsed_col.opcua_port}",f"{parsed_col.ip}:{parsed_col.health_port}"]}]
+    }
+    # Insert data in prometheus structure
+    if (exporter_id!=-1):
+        prometheus_conf['scrape_configs'][exporter_id] = ex_data
+    else:
+        prometheus_conf['scrape_configs'].append(ex_data)
+    
+    return(prometheus_conf)
+# --------------------
 
 # --------------------
-def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+def _delete_prometheus_conf(parsed_col):
+    ''' Load the existing Prometheus configuration and update it.\n
+    `parsed_col` (schema.collector): The collector information.\n
+    return `prometheus_conf` (dict): The `prometheus.yml` file updated for
+    this collector.\n
+    '''
+
+    prometheus_conf = Env.DEFAULTS['Prometheus']
+
+    # Read existing Prometheus File
+    try:
+        with fsspec.open(Env.PROMETHEUS_FILEURL, 'r', host=parsed_col.ip, 
+            port=int(parsed_col.ssh_port), username=parsed_col.ssh_user) as fid:
+            prometheus_conf_r = yaml.safe_load(fid)
+        prometheus_conf = deep_update(prometheus_conf,prometheus_conf_r)
+    except:
+        pass
+
+    # Search for existing configuration
+    exporter_id = -1
+    for i,conf in enumerate(prometheus_conf['scrape_configs']):
+        if( conf['job_name']==parsed_col.name ):
+            exporter_id = i
+    
+    # Remove data from prometheus structure
+    if (exporter_id!=-1):
+        _ = prometheus_conf['scrape_configs'].pop(exporter_id)
+    
+    return(prometheus_conf)
+# --------------------
+
+# --------------------
+def _write_prometheus_file(parsed_col, prometheus_conf):
+    ''' Description \n
+    `` (): \n
+    return `` (): \n
+    '''
+    with fsspec.open(Env.PROMETHEUS_FILEURL, 'w', encoding = "utf-8", host=parsed_col.ip, 
+        port=int(parsed_col.ssh_port), username=parsed_col.ssh_user) as fid:
+        p_dump = yaml.dump(prometheus_conf, allow_unicode=True, encoding=None, default_flow_style=False)
+        fid.write( p_dump )
+# --------------------
+
+# --------------------
+def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Export active database entries as a Forte OPC-UA gateway fboot file.\n
     return `res` (JSONResponse): A `bool` automatically parser into
     a HTTP_OK response.\n
     '''
     res = False
 
-    val_col = Tcollector.get_by_id(db,id=1)
+    val_col = Tcollector.get_by_id(db,id)
+    if val_col==None:
+        raise HTTPException(status_code=404, detail=f"Error searching for Collector to Export. Invalid ID.")
+    
     parsed_col = Tcollector._parse_collector(val_col)
 
     # Create the 4diac Gateway Project
     prj_4diac = MonoGatewayProject(cycle_time=int(Env.CYCLETIME))
 
     # Create OPCUA configuration file
-    opcua_conf = { 'endPoint':f'opc.tcp://{parsed_col.ip}:{parsed_col.port}', 'nodes':[] }
+    opcua_conf = { 'endPoint':f'opc.tcp://forte_server:4840', 'nodes':[] }
 
     try:
         # Get active datasources
         ds_list = Tdatasource.get_datasources_active(db)
         for ds in ds_list:
+            # Filter datasources for the ones in this collector
+            if ds.collector_id!=parsed_col.id:
+                continue
             # Filter datasources for confirmed ones
             if ds.pending:
                 continue
@@ -79,48 +170,20 @@ def export_gateway(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
             'metricHelp':'Tempo de leitura das variavies do Forte'
         })
 
-        protocol, _ = fsspec.core.split_protocol(Env.OPCUA_FILEURL)
-
-        if protocol=='file':
-            # Write Forte project
-            prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True)
-            # Write OPC configuration
-            with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8") as fid:
-                dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
-                fid.write( dump )
-            # Read Prometheus File
-            with fsspec.open(Env.PROMETHEUS_FILEURL, 'r') as fid:
-                prometheus_conf = yaml.safe_load(fid)
-            # Change values
-            prometheus_conf['global']['scrape_interval'] = f"{parsed_col.update_period}s"
-            prometheus_conf['global']['evaluation_interval'] = f"{parsed_col.update_period}s"
-            # Save Prometheus File
-            with fsspec.open(Env.PROMETHEUS_FILEURL, 'w', encoding = "utf-8") as fid:
-                p_dump = yaml.dump(prometheus_conf, allow_unicode=True, encoding=None, default_flow_style=False)
-                fid.write( p_dump )
-
-        else:
-            # Write Forte project remote
-            prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True,
-                host=Env.FBOOT_SSH_IP, port=int(Env.FBOOT_SSH_PORT),
-                username=Env.FBOOT_SSH_USERNAME)
-            # Write OPC configuration remote
-            with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8", host=Env.FBOOT_SSH_IP, 
-                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
-                dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
-                fid.write( dump )
-            # Read Prometheus File
-            with fsspec.open(Env.PROMETHEUS_FILEURL, 'r', host=Env.FBOOT_SSH_IP, 
-                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
-                prometheus_conf = yaml.safe_load(fid)
-            # Change values
-            prometheus_conf['global']['scrape_interval'] = f"{parsed_col.update_period}s"
-            prometheus_conf['global']['evaluation_interval'] = f"{parsed_col.update_period}s"
-            # Save Prometheus File
-            with fsspec.open(Env.PROMETHEUS_FILEURL, 'w', encoding = "utf-8", host=Env.FBOOT_SSH_IP, 
-                port=int(Env.FBOOT_SSH_PORT), username=Env.FBOOT_SSH_USERNAME) as fid:
-                p_dump = yaml.dump(prometheus_conf, allow_unicode=True, encoding=None, default_flow_style=False)
-                fid.write( p_dump )
+        # Get the updated prometheus configuration
+        prometheus_conf = _update_prometheus_conf(parsed_col,parsed_col)
+        
+        # Write Forte project remote
+        prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True,
+            host=parsed_col.ip, port=int(parsed_col.ssh_port),
+            username=parsed_col.ssh_user)
+        # Write OPC configuration remote
+        with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8", host=parsed_col.ip, 
+            port=int(parsed_col.ssh_port), username=parsed_col.ssh_user) as fid:
+            dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
+            fid.write( dump )        
+        # Write Prometheus File        
+        _write_prometheus_file(parsed_col, prometheus_conf)
 
         # Return Status
         res = True

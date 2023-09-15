@@ -25,6 +25,7 @@ class dataSourceInfo(BaseModel):
     plc_port: int
     cycletime: int
     timeout: int
+    collector_id: int
     protocol: protocolInfo
 
 class protocol(protocolInfo):

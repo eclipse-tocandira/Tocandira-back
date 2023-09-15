@@ -41,7 +41,7 @@ def get_datapoint_defaults(prot_name:str, usr:str=Depends(usr_routes._check_vali
 def create_datapoint(datapoint:schemas.dataPointInfo, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Create an entry at in database to save this DataPoint.\n
     `datapoint` (schemas.dataPointInfo): DataPoint informations.\n
-    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     try:
@@ -61,7 +61,7 @@ def create_datapoint(datapoint:schemas.dataPointInfo, db:Session=Depends(get_db)
 def get_datapoint_by_name(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name.\n
     `dp_name` (str): DataPoint name.\n
-    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.get_datapoint_by_name(db, dp_name)
@@ -77,7 +77,7 @@ def get_datapoint_by_name(dp_name:str, db:Session=Depends(get_db), usr:str=Depen
 def update_datapoint(datapoint:schemas.dataPointInfo, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name and update it's informations.\n
     `datapoint` (schemas.dataPointInfo): DataPoint informations.\n
-    return `val_dp` (JSONResponse): A `schemas.datapoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.datapoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.update_datapoint(db, datapoint)
@@ -94,7 +94,7 @@ def change_datapoint_active_status(dp_name:str, active:bool, db:Session=Depends(
     ''' Search an entry in database with provided name and change it's activated state.\n
     `dp_name` (str): DataPoint name.\n
     `active` (bool): Active state.\n
-    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.activate_datapoint(db, dp_name, active)
@@ -110,7 +110,7 @@ def change_datapoint_active_status(dp_name:str, active:bool, db:Session=Depends(
 def confirm_datapoints(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search the names in database and change their pending state to False.\n
     `dp_name` (str): DataPoint name.\n
-    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.confirm_datapoint(db, dp_name)
@@ -125,7 +125,7 @@ def confirm_datapoints(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(
 # --------------------
 def get_datapoints(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datapoint entries in database.\n
-    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.get_datapoints(db)
@@ -140,7 +140,7 @@ def get_datapoints(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check
 # --------------------
 def get_datapoints_pending(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datapoint that are pending in database.\n
-    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.get_datapoints_pending(db)
@@ -155,7 +155,7 @@ def get_datapoints_pending(db:Session=Depends(get_db), usr:str=Depends(usr_route
 # --------------------
 def get_datapoints_active(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datapoint that are acrive in database.\n
-    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.get_datapoints_active(db)
@@ -172,7 +172,7 @@ def get_datapoints_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:st
     ''' Get all datapoint entries in database.\n
     `ini` (int): First query result to show. Starts at `1`.\n
     `end` (int): Last query result to show, inclusive. \n
-    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A list of `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
 
@@ -192,7 +192,7 @@ def get_datapoints_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:st
 def del_datapoint_by_name(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Delete the specified entry from database.\n
     `ds_name` (str): DataPoint name.\n
-    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parser into
+    return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_dp = Tdatapoint.delete_datapoint(db, dp_name)

@@ -20,18 +20,27 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    password = Column(String)
-    is_admin = Column(Boolean, default=True)
+    name = Column(String, index=True, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    change_password = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
 
 class Collector(Base):
     __tablename__ = "collector"
 
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
     ip = Column(String)
-    port = Column(Integer)
+    ssh_port = Column(Integer)
+    ssh_user = Column(String, nullable=False)
+    ssh_pass = Column(String, nullable=False)
+    opcua_port = Column(Integer)
+    health_port = Column(Integer)
+    valid = Column(Boolean, default=False)
     update_period = Column(Integer)
     timeout = Column(Integer)
+    # Other tables
+    datasources = relationship("DataSource", back_populates="collector")# 1 to N
     
 # --------------------
 class DataPoint(Base):
@@ -64,8 +73,10 @@ class DataSource(Base):
     active = Column(Boolean, default=True)
     pending = Column(Boolean, default=True)
     # Other tables
-    protocol = relationship("Protocol", back_populates="datasource", uselist=False)# 1 to 1
+    protocol = relationship("Protocol", uselist=False)# 1 to 1
     datapoints = relationship("DataPoint", back_populates="datasource")# 1 to N
+    collector = relationship("Collector", back_populates="datasources")# N to 1
+    collector_id = Column(Integer, ForeignKey("collector.id"))
 # --------------------
 
 # --------------------

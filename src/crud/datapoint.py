@@ -187,6 +187,8 @@ class Tdatapoint:
                     value = dp_update.access.data[param]
                 setattr(dp,param,value)
 
+            # Set validation to False 
+            dp.pending = True
             # Parse data
             dp_answer = Tdatapoint._parse_datapoint(dp)
             
@@ -407,4 +409,24 @@ class Tdatapoint:
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
         
         return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def get_datapoints_from_collector(db:Session, id:int):
+        ''' Get all datapoints associated with a collector.\n
+        `db` (Session): Database access session.\n
+        `id` (int): Collector id to search for.\n
+        return `dp_answer` (list): List of datapoints.\n
+        '''
+        dp_answer = []
+
+        qry = db.query(models.Collector)
+        col = qry.filter(models.Collector.id == id).first()
+
+        if (col is not None):
+            for ds in col.datasources:
+                dp_answer += Tdatapoint.get_datapoints_from_datasource(db,ds.name)
+        
+        return(dp_answer)
     # --------------------

@@ -94,9 +94,41 @@ class Tuser:
         return `db_user` (models.User): The created user data.\n
         '''
         new_user.password = Tuser.get_password_hash(new_user.password)
-        db_user = models.User(name=new_user.name, password=new_user.password)
+        db_user = models.User(name=new_user.name, password=new_user.password,
+            change_password=new_user.change_password, is_admin=new_user.is_admin)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
         return db_user
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def delete(db: Session, username: str):
+        ''' Delete a user in the database.\n
+        `db` (Session): Database session instance.\n
+        `username` (string): The user name that will be deleted.\n
+        return `num` (integer): Number of deleted users.\n
+        '''
+        num = db.query(models.User).filter(models.User.name == username).delete()
+        db.commit()
+        return num
+    # --------------------    
+
+    # --------------------
+    @staticmethod
+    def change_password(db:Session, username: str, new_password: str):
+        '''Change the user password.\n
+        `db` (Session): Database session instance.\n
+        `username` (string): The user name whose password will be changed.\n
+        `new_password` (string): The new password.\n
+        return (boolean): Returns true.\n
+        '''
+        user = Tuser.get_by_name(db, name=username)
+        user.password = Tuser.get_password_hash(new_password)
+        user.change_password = False
+        db.commit()
+        db.refresh(user)
+
+        return True
     # --------------------

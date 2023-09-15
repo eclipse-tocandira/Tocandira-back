@@ -59,7 +59,7 @@ def get_datasource_defaults(prot_name:str, usr:str=Depends(usr_routes._check_val
 def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Create an entry at in database to save this DataSource.\n
     `datasource` (schemas.dataSourceInfo): DataSource informations.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     try:
@@ -79,7 +79,7 @@ def create_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_
 def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name.\n
     `ds_name` (str): DataSource name.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.get_datasource_by_name(db, ds_name)
@@ -95,7 +95,7 @@ def get_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depe
 def update_datasource(datasource:schemas.dataSourceInfo, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search an entry in database with provided name and update it's informations.\n
     `datasource` (schemas.dataSourceInfo): DataSource informations.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.update_datasource(db, datasource)
@@ -112,7 +112,7 @@ def change_datasource_active_status(ds_name:str, active:bool, db:Session=Depends
     ''' Search an entry in database with provided name and change it's activated state.\n
     `ds_name` (str): DataSource name.\n
     `active` (bool): Active state.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.activate_datasource(db, ds_name, active)
@@ -128,7 +128,7 @@ def change_datasource_active_status(ds_name:str, active:bool, db:Session=Depends
 def confirm_datasources(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search the names in database and change their pending state to False.\n
     `ds_name` (str): DataSource name.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.confirm_datasource(db, ds_name)
@@ -143,7 +143,7 @@ def confirm_datasources(ds_name:str, db:Session=Depends(get_db), usr:str=Depends
 # --------------------
 def get_datasources(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datasource entries in database.\n
-    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.get_datasources(db)
@@ -158,7 +158,7 @@ def get_datasources(db:Session=Depends(get_db), usr:str=Depends(usr_routes._chec
 # --------------------
 def get_datasources_pending(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datasource that are pending in database.\n
-    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.get_datasources_pending(db)
@@ -173,7 +173,7 @@ def get_datasources_pending(db:Session=Depends(get_db), usr:str=Depends(usr_rout
 # --------------------
 def get_datasources_active(db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Get all datasource that are acrive in database.\n
-    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.get_datasources_active(db)
@@ -190,7 +190,7 @@ def get_datasources_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:s
     ''' Get all datasource entries in database.\n
     `ini` (int): First query result to show. Starts at `1`.\n
     `end` (int): Last query result to show, inclusive. \n
-    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A list of `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
 
@@ -210,7 +210,7 @@ def get_datasources_by_range(ini:int, end:int, db:Session=Depends(get_db), usr:s
 def del_datasource_by_name(ds_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Delete the specified entry from database.\n
     `ds_name` (str): DataSource name.\n
-    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parser into
+    return `val_ds` (JSONResponse): A `schemas.dataSource` automatically parsed into
     a HTTP_OK response.\n
     '''
     val_ds = Tdatasource.delete_datasource(db, ds_name)
