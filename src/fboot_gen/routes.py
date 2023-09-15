@@ -56,8 +56,9 @@ def _update_prometheus_conf(old,parsed_col):
     
     # Write data into correct format
     ex_data = { 'job_name': parsed_col.name,
-        'scrape_interval': f"{parsed_col.update_period}s", 'targets': 
-        [f"{parsed_col.ip}:{parsed_col.opcua_port}",f"{parsed_col.ip}:{parsed_col.health_port}"]
+        'scrape_interval': f"{parsed_col.update_period}s", 
+        'static_configs':[{'labels':{'group':parsed_col.name},'targets': 
+        [f"{parsed_col.ip}:{parsed_col.opcua_port}",f"{parsed_col.ip}:{parsed_col.health_port}"]}]
     }
     # Insert data in prometheus structure
     if (exporter_id!=-1):
