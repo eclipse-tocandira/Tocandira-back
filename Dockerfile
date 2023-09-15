@@ -1,7 +1,7 @@
 FROM python:3.11-alpine3.18
 
 WORKDIR /code
-RUN apk add --no-cache gcc g++ musl-dev git
+RUN apk add --no-cache gcc g++ musl-dev git libffi-dev
 RUN apk add --no-cache openssh
 
 ENV GROUP_ID=1000
