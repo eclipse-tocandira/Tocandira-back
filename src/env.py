@@ -38,8 +38,6 @@ class Enviroment:
     DEFAULTS = json.load(open(DEFAULT_FILE,'r'))
     '''`DEFAULTS` (json): Loaded Defaults from DEFAULT_FILE'''
 
-    CYCLETIME = os.getenv('CONF_CYCLETIME', default='5000')
-
     OPCUA_FILEURL = os.getenv('OPCUA_FILEURL', default='./opcua_exporter.yml')
     '''`OPCUA_FILEURL` (str): Local or Remote path to save the generated
     OPCUA Exporter configuration file. Default is `"./opcua_exporter.yml"`'''

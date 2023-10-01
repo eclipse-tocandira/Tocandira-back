@@ -60,7 +60,7 @@ class Tdatasource:
                 name=this_prot['name']['value'],
                 plc_ip=this_prot['plc_ip']['value'],
                 plc_port=int(this_prot['plc_port']['value']),
-                cycletime=int(Env.CYCLETIME),
+                cycletime=int(this_prot['cycletime']['value']),
                 timeout=int(this_prot['timeout']['value']),
                 collector_id=0,
                 protocol=schemas.protocolInfo(name=prot_name, data=p_info)

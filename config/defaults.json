@@ -5,6 +5,7 @@
             "plc_ip":{"value":"0.0.0.0"},
             "plc_port":{"value":"102"},
             "timeout":{"value":"2000"},
+            "cycletime":{"value":"5000"},
             "protocol":{
                 "rack":{"value":"0"},
                 "slot":{"value":"1"},
@@ -16,6 +17,7 @@
             "plc_ip":{"value":"0.0.0.0"},
             "plc_port":{"value":"44818"},
             "timeout":{"value":"2000"},
+            "cycletime":{"value":"5000"},
             "protocol":{
                 "path":{"value":"1,16,A,11"},
                 "slot":{"value":"0"},
@@ -27,6 +29,7 @@
             "plc_ip":{"value":"0.0.0.0"},
             "plc_port":{"value":"502"},
             "timeout":{"value":"2000"},
+            "cycletime":{"value":"5000"},
             "protocol":{
                 "slave_id":{"value":"0"}
             }

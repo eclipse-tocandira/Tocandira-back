@@ -128,7 +128,7 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
     parsed_col = Tcollector._parse_collector(val_col)
 
     # Create the 4diac Gateway Project
-    prj_4diac = MonoGatewayProject(cycle_time=int(Env.CYCLETIME))
+    prj_4diac = MonoGatewayProject(parsed_col.update_period*1000)
 
     # Create OPCUA configuration file
     opcua_conf = { 'endPoint':f'opc.tcp://forte_server:4840', 'nodes':[] }
