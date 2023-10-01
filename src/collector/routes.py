@@ -59,7 +59,8 @@ def get_collector(id:int, db:Session=Depends(get_db), usr:str=Depends(usr_routes
 def update_collector(id:int,collector:schemas.collectorCreate, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Update the collector entry in the database.\n
     `id` (int): The Collector ID.\n
-    `collector` (schemas.collector): The Collector to update.\n
+    `collector` (schemas.collector): The Collector to update. If the password is leff blank it
+    will not update.\n
     return `parsed_col` (JSONResponse): Updated data of `schemas.collector` automatically parsed into
     a HTTP_OK response.\n
     '''

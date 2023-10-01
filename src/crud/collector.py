@@ -132,7 +132,8 @@ class Tcollector:
     def update(db: Session, id:int ,col_data: schemas.collectorCreate):
         ''' Update the entry in the database.\n
         `db` (Session): Database session instance.\n
-        `col_data` (schemas.collector): Existing collector information.\n
+        `col_data` (schemas.collector): Existing collector information. A blank
+        password string means no update on that field.\n
         return `db_col` (models.Collector): The updated collector data.\n
         '''
         db_col = Tcollector.get_by_id(db,id)
@@ -144,7 +145,8 @@ class Tcollector:
         db_col.health_port=col_data.health_port
         db_col.ssh_user=col_data.ssh_user
         db_col.prj_path=col_data.prj_path
-        db_col.ssh_pass=col_data.ssh_pass
+        if (col_data.ssh_pass!=""):
+            db_col.ssh_pass=col_data.ssh_pass
         db_col.valid=False
         db_col.update_period=col_data.update_period
         db_col.timeout=col_data.timeout
