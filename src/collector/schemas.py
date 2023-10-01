@@ -16,6 +16,7 @@ class collectorInfo(BaseModel):
     name: str
     ssh_port: int
     ssh_user: str
+    prj_path: str
     opcua_port: int
     health_port: int
     update_period: int

@@ -36,6 +36,7 @@ class Tcollector:
             name=default['name'],
             ssh_port=default['ssh_port'],
             ssh_user=default['ssh_user'],
+            prj_path=default['prj_path'],
             opcua_port=default['opcua_port'],
             health_port=default['health_port'],
             update_period=default['update_period'],
@@ -61,6 +62,7 @@ class Tcollector:
             ssh_port=col_data.ssh_port,
             ssh_user=col_data.ssh_user,
             ssh_pass=col_data.ssh_pass,
+            prj_path=col_data.prj_path,
             opcua_port=col_data.opcua_port,
             health_port=col_data.health_port,
             valid=False,
@@ -88,6 +90,7 @@ class Tcollector:
             name=db_col.name,
             ssh_port=db_col.ssh_port,
             ssh_user=db_col.ssh_user,
+            prj_path=db_col.prj_path,
             opcua_port=db_col.opcua_port,
             health_port=db_col.health_port,
             valid=db_col.valid,
@@ -140,6 +143,7 @@ class Tcollector:
         db_col.opcua_port=col_data.opcua_port
         db_col.health_port=col_data.health_port
         db_col.ssh_user=col_data.ssh_user
+        db_col.prj_path=col_data.prj_path
         db_col.ssh_pass=col_data.ssh_pass
         db_col.valid=False
         db_col.update_period=col_data.update_period

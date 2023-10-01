@@ -34,6 +34,7 @@ class Collector(Base):
     ssh_port = Column(Integer)
     ssh_user = Column(String, nullable=False)
     ssh_pass = Column(String, nullable=False)
+    prj_path = Column(String, nullable=False)
     opcua_port = Column(Integer)
     health_port = Column(Integer)
     valid = Column(Boolean, default=False)

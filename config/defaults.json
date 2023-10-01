@@ -67,6 +67,7 @@
         "ip":"127.0.0.1",
         "ssh_port":"22",
         "ssh_user":"",
+        "prj_path":"/home/opper/bin/gateway",
         "opcua_port":"9686",
         "health_port":"9100",
         "update_period":"30"
