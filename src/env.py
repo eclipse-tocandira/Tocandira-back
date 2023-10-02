@@ -42,5 +42,13 @@ class Enviroment:
     '''`PROMETHEUS_FILEURL` (str): Local or Remote path to save the modified
     configuration file for prometheus. Default is `"./prometheus.yml"`'''
 
+    OPCUA_GATEWAY_LOCATION = os.getenv('OPCUA_GATEWAY_LOCATION', default='config/opcua_exporter.yml')
+    '''`OPCUA_GATEWAY_LOCATION` (str): Relative path for exporter configuration file on `Tocandira-opcua-Gateway`
+    project. Default is `"config/opcua_exporter.yml"`'''
+
+    FBOOT_GATEWAY_LOCATION = os.getenv('FBOOT_GATEWAY_LOCATION', default='fboot/gw_opc.fboot')
+    '''`FBOOT_GATEWAY_LOCATION` (str): Relative path for Fboot file on `Tocandira-opcua-Gateway` project.
+    Default is `"fboot/gw_opc.fboot"`'''
+
     OPCUA_TESTER_PORT = os.getenv('OPCUA_TESTER_PORT', default='4900')
     '''`OPCUA_TESTER_PORT` (str): The OpcUA tester port on forte project. Default is `"4900"`'''
