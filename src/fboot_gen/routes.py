@@ -17,6 +17,7 @@ from pyfboot.gateway import MonoGatewayProject
 from pydantic.utils import deep_update
 import fsspec
 import yaml
+import os
 
 # Import custom libs
 from ..database import get_db
@@ -174,11 +175,13 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
         prometheus_conf = _update_prometheus_conf(parsed_col,val_col)
         
         # Write Forte project remote
-        prj_4diac.write_fboot(Env.FBOOT_FILEURL, overwrite=True,
+        fboot_fileurl = os.path.join(parsed_col.prj_path,'fboot/gw_opc.fboot')
+        prj_4diac.write_fboot(fboot_fileurl, overwrite=True,
             host=val_col.ip, port=int(val_col.ssh_port),
             username=val_col.ssh_user, password=val_col.ssh_pass)
         # Write OPC configuration remote
-        with fsspec.open(Env.OPCUA_FILEURL, "w", encoding = "utf-8", host=val_col.ip, 
+        opcua_fileurl = os.path.join(parsed_col.prj_path,'config/opcua_exporter.yml')
+        with fsspec.open(opcua_fileurl, "w", encoding = "utf-8", host=val_col.ip, 
             port=int(val_col.ssh_port), username=val_col.ssh_user, password=val_col.ssh_pass) as fid:
             dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
             fid.write( dump )        

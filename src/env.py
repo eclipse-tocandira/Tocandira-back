@@ -38,17 +38,9 @@ class Enviroment:
     DEFAULTS = json.load(open(DEFAULT_FILE,'r'))
     '''`DEFAULTS` (json): Loaded Defaults from DEFAULT_FILE'''
 
-    OPCUA_FILEURL = os.getenv('OPCUA_FILEURL', default='./opcua_exporter.yml')
-    '''`OPCUA_FILEURL` (str): Local or Remote path to save the generated
-    OPCUA Exporter configuration file. Default is `"./opcua_exporter.yml"`'''
-    
     PROMETHEUS_FILEURL = os.getenv('PROMETHEUS_FILEURL', default='./prometheus.yml')
     '''`PROMETHEUS_FILEURL` (str): Local or Remote path to save the modified
     configuration file for prometheus. Default is `"./prometheus.yml"`'''
 
-    FBOOT_FILEURL = os.getenv('FBOOT_FILEURL', default='./forte.fboot')
-    '''`FBOOT_FILEURL` (str): Local or Remote path to save the generated
-    Forte fboot file. Default is `"./forte.fboot"`'''
-    
     OPCUA_TESTER_PORT = os.getenv('OPCUA_TESTER_PORT', default='4900')
     '''`OPCUA_TESTER_PORT` (str): The OpcUA tester port on forte project. Default is `"4900"`'''
