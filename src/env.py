@@ -42,12 +42,12 @@ class Enviroment:
     '''`PROMETHEUS_FILEURL` (str): Local or Remote path to save the modified
     configuration file for prometheus. Default is `"./prometheus.yml"`'''
 
-    OPCUA_GATEWAY_LOCATION = os.getenv('OPCUA_GATEWAY_LOCATION', default='config/opcua_exporter.yml')
-    '''`OPCUA_GATEWAY_LOCATION` (str): Relative path for exporter configuration file on `Tocandira-opcua-Gateway`
+    EXPORTER_CONFIG_LOCATION = os.getenv('EXPORTER_CONFIG_LOCATION', default='config/opcua_exporter.yml')
+    '''`EXPORTER_CONFIG_LOCATION` (str): Relative path for exporter configuration file on `Tocandira-opcua-Gateway`
     project. Default is `"config/opcua_exporter.yml"`'''
 
-    FBOOT_GATEWAY_LOCATION = os.getenv('FBOOT_GATEWAY_LOCATION', default='fboot/gw_opc.fboot')
-    '''`FBOOT_GATEWAY_LOCATION` (str): Relative path for Fboot file on `Tocandira-opcua-Gateway` project.
+    GATEWAY_FBOOT_LOCATION = os.getenv('GATEWAY_FBOOT_LOCATION', default='fboot/gw_opc.fboot')
+    '''`GATEWAY_FBOOT_LOCATION` (str): Relative path for Fboot file on `Tocandira-opcua-Gateway` project.
     Default is `"fboot/gw_opc.fboot"`'''
 
     OPCUA_TESTER_PORT = os.getenv('OPCUA_TESTER_PORT', default='4900')
