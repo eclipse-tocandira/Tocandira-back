@@ -175,12 +175,12 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
         prometheus_conf = _update_prometheus_conf(parsed_col,val_col)
         
         # Write Forte project remote
-        fboot_fileurl = os.path.join(parsed_col.prj_path,Env.GATEWAY_FBOOT_LOCATION)
+        fboot_fileurl = os.path.join('ssh://'+parsed_col.prj_path,Env.GATEWAY_FBOOT_LOCATION)
         prj_4diac.write_fboot(fboot_fileurl, overwrite=True,
             host=val_col.ip, port=int(val_col.ssh_port),
             username=val_col.ssh_user, password=val_col.ssh_pass)
         # Write OPC configuration remote
-        opcua_fileurl = os.path.join(parsed_col.prj_path,Env.EXPORTER_CONFIG_LOCATION)
+        opcua_fileurl = os.path.join('ssh://'+parsed_col.prj_path,Env.EXPORTER_CONFIG_LOCATION)
         with fsspec.open(opcua_fileurl, "w", encoding = "utf-8", host=val_col.ip, 
             port=int(val_col.ssh_port), username=val_col.ssh_user, password=val_col.ssh_pass) as fid:
             dump =  yaml.dump(opcua_conf, allow_unicode=True, encoding=None)
