@@ -29,4 +29,5 @@ class dataPointInfo(BaseModel):
 class dataPoint(dataPointInfo):
     active: bool
     pending: bool
+    upload: bool
     # datasource: ds_schemas.dataSource

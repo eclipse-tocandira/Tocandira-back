@@ -54,6 +54,7 @@ class DataPoint(Base):
     access = Column(String, nullable=False)
     active = Column(Boolean, default=True)
     pending = Column(Boolean, default=True)
+    upload = Column(Boolean, default=False)
     # Other tables
     datasource = relationship("DataSource", back_populates="datapoints")# N to 1
     datasource_name = Column(Integer, ForeignKey("datasources.name"))

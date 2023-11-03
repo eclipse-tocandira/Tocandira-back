@@ -107,13 +107,14 @@ def change_datapoint_active_status(dp_name:str, active:bool, db:Session=Depends(
 # --------------------
 
 # --------------------
-def confirm_datapoints(dp_name:str, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
+def confirm_datapoints(dp_name:str, pending:bool, db:Session=Depends(get_db), usr:str=Depends(usr_routes._check_valid_token)):
     ''' Search the names in database and change their pending state to False.\n
     `dp_name` (str): DataPoint name.\n
+    `pending` (bool): new value of pending.\n
     return `val_dp` (JSONResponse): A `schemas.dataPoint` automatically parsed into
     a HTTP_OK response.\n
     '''
-    val_dp = Tdatapoint.confirm_datapoint(db, dp_name)
+    val_dp = Tdatapoint.confirm_datapoint(db, dp_name, pending)
 
     if (val_dp is None):
         m_name = f"Data Point"

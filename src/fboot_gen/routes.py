@@ -121,6 +121,7 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
     a HTTP_OK response.\n
     '''
     res = False
+    dp_upload = []
 
     val_col = Tcollector.get_by_id(db,id)
     if val_col==None:
@@ -163,6 +164,7 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
                         'metricName':f'{dp.name}',
                         'metricHelp':f'{dp.description}'
                     })
+                    dp_upload.append(dp)
 
         # Insert one more node with the pre-defined observability variable
         opcua_conf['nodes'].append({
@@ -195,6 +197,11 @@ def export_gateway(id:int,db:Session=Depends(get_db), usr:str=Depends(usr_routes
         msg = str(exc).split('\n')[0]
         msg = f'Export Error: "{msg}"'
         raise HTTPException(status_code=520, detail=msg)
+
+    if(res):
+        for dp in dp_upload:
+            # Get specific informations
+            _ = Tdatapoint.confirm_upload_datapoint(db,dp.name,True)
 
     return(res)
 # --------------------
