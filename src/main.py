@@ -8,7 +8,7 @@ Copyright (c) 2017 Aimirim STI.\n
 
 # Import system libs
 from typing import Dict, List
-from fastapi import FastAPI
+from fastapi import FastAPI, responses
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import custom libs
@@ -111,6 +111,10 @@ app.add_api_route("/collectors/status",
     methods=["GET"], response_model=List[col_schemas.collectorStatus],
     endpoint=col_routes.check_collectors_status)
 
+app.add_api_route("/check_ssh_access",
+    methods=["POST"], response_model=Dict[str,str],
+    endpoint=col_routes.check_ssh_access)
+
 ### DataSources
 app.add_api_route("/datasource",
     methods=["POST"], response_model=ds_schemas.dataSource,
@@ -189,7 +193,7 @@ app.add_api_route("/datapoints/active",
     methods=["GET"], response_model=List[dp_schemas.dataPoint],
     endpoint=dp_routes.get_datapoints_active)
 
-app.add_api_route("/datapoint/{dp_name}/confirm/{pending}",
+app.add_api_route("/datapoint/{dp_name}/confirm",
     methods=["PUT"], response_model=Dict[str,bool],
     endpoint=dp_routes.confirm_datapoints)
 
