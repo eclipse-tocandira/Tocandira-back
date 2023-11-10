@@ -8,7 +8,7 @@ Copyright (c) 2017 Aimirim STI.\n
 '''
 
 # Import system libs
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, responses
 from sqlalchemy.orm import Session
 from paramiko import SSHClient, AutoAddPolicy
 import socket
@@ -122,6 +122,27 @@ def get_all_collectors(db:Session=Depends(get_db), usr:str=Depends(usr_routes._c
     for c in col_list:
         parsed_list.append(Tcollector._parse_collector(c))
     return(parsed_list)
+# --------------------
+
+# --------------------
+def check_ssh_access(collector:schemas.collectorCreate, usr:str=Depends(usr_routes._check_valid_token)):
+    ''' Check an ssh access before creating the collector in the database.\n
+    `collector` (schemas.collectorCreate): New Collector informations.\n
+    return `response` (JSONResponse): Connection Status.\n
+    '''
+    
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    
+    try:
+        ssh.connect(collector.ip, username=collector.ssh_user, password=collector.ssh_pass, port=collector.ssh_port, timeout=2)
+        response = responses.JSONResponse(content='Connection OK')
+    except Exception as ex:
+        response = responses.JSONResponse(content=str(ex),status_code=400)
+    
+    ssh.close()
+
+    return(response)
 # --------------------
 
 # --------------------
