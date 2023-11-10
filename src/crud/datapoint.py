@@ -115,6 +115,7 @@ class Tdatapoint:
             access=schemas.accessInfo(name=db_dp.access,data=access_data),
             active=db_dp.active,
             pending=db_dp.pending,
+            upload=db_dp.upload,
             # datasource=ds_info
         )
 
@@ -252,7 +253,7 @@ class Tdatapoint:
         dbq = db.query(models.DataPoint)
 
         # Get Datapoint list
-        for dp in dbq.filter(models.Datapoint.pending==True).all():
+        for dp in dbq.filter(models.DataPoint.pending==True).all():
             dp = Tdatapoint._get_datapoint_implementation(db,dp.access,dp.name)
             # Parse data
             dp_answer.append( Tdatapoint._parse_datapoint(dp) )
@@ -282,10 +283,11 @@ class Tdatapoint:
     
     # --------------------
     @staticmethod
-    def confirm_datapoint(db:Session, dp_name:str):
-        ''' Set specified datapoints to pending `False`.\n
+    def confirm_datapoint(db:Session, dp_name:str, pending:bool):
+        ''' Set specific data points as pending variable value pending.\n
         `db` (Session): Database access session.\n
         `dp_name` (str): DataPoint name.\n
+        `pending` (bool): new value of pending.\n
         return `dp_answer` (list): List of datapoints in database.\n
         '''
         dp_answer = {}
@@ -297,7 +299,35 @@ class Tdatapoint:
         dp = dbq.filter(models.DataPoint.name == dp_name).first()
         if (dp is not None):
             # Insert in database
-            dp.pending = False
+            dp.pending = pending
+            db.commit()
+            # Parse data
+            dp_answer[dp_name] = True
+        else:
+            dp_answer[dp_name] = False
+            
+        return (dp_answer)
+    # --------------------
+
+    # --------------------
+    @staticmethod
+    def confirm_upload_datapoint(db:Session, dp_name:str, upload:bool):
+        ''' Set specific data points as pending variable value upload.\n
+        `db` (Session): Database access session.\n
+        `dp_name` (str): DataPoint name.\n
+        `upload` (bool): new value of upload.\n
+        return `dp_answer` (list): List of datapoints in database.\n
+        '''
+        dp_answer = {}
+
+        # Declare the query
+        dbq = db.query(models.DataPoint)
+
+        # Get specific Datapoint
+        dp = dbq.filter(models.DataPoint.name == dp_name).first()
+        if (dp is not None):
+            # Insert in database
+            dp.upload = upload
             db.commit()
             # Parse data
             dp_answer[dp_name] = True

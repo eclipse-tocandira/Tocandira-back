@@ -189,7 +189,7 @@ app.add_api_route("/datapoints/active",
     methods=["GET"], response_model=List[dp_schemas.dataPoint],
     endpoint=dp_routes.get_datapoints_active)
 
-app.add_api_route("/datapoint/{dp_name}/confirm",
+app.add_api_route("/datapoint/{dp_name}/confirm/{pending}",
     methods=["PUT"], response_model=Dict[str,bool],
     endpoint=dp_routes.confirm_datapoints)
 
