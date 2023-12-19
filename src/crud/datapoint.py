@@ -283,11 +283,10 @@ class Tdatapoint:
     
     # --------------------
     @staticmethod
-    def confirm_datapoint(db:Session, dp_name:str, pending:bool):
+    def confirm_datapoint(db:Session, dp_name:str):
         ''' Set specific data points as pending variable value pending.\n
         `db` (Session): Database access session.\n
         `dp_name` (str): DataPoint name.\n
-        `pending` (bool): new value of pending.\n
         return `dp_answer` (list): List of datapoints in database.\n
         '''
         dp_answer = {}
@@ -299,7 +298,7 @@ class Tdatapoint:
         dp = dbq.filter(models.DataPoint.name == dp_name).first()
         if (dp is not None):
             # Insert in database
-            dp.pending = pending
+            dp.pending = False
             db.commit()
             # Parse data
             dp_answer[dp_name] = True
