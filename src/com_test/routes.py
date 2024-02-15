@@ -6,14 +6,12 @@ Copyright (c) 2017 Aimirim STI.\n
 * fastapi
 * sqlalchemy
 * pyfboot
-* opcua
 '''
 
 # Import system libs
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 import pyfboot.typelibrary as tlib
-from opcua import Client
 
 # Import custom libs
 from . import schemas
@@ -73,15 +71,20 @@ def _test_server_connect(endpoint:str,function:str,param:str):
 
     # Open the connection with OPC-UA
     try:
-        # Insert parameters
-        opc_client = Client(endpoint)
-        # Open
-        opc_client.connect()
-        opc_objects = opc_client.get_objects_node()
-        # Call the remote method
-        response = opc_objects.call_method(function, param)
-        # Close
-        opc_client.disconnect()
+        # TODO: Need to use another OPCua client because the python-opcua
+        #       has a license issue with Eclipse Lincense.
+        pass
+
+        # # Insert parameters
+        # from opcua import Client
+        # opc_client = Client(endpoint)
+        # # Open
+        # opc_client.connect()
+        # opc_objects = opc_client.get_objects_node()
+        # # Call the remote method
+        # response = opc_objects.call_method(function, param)
+        # # Close
+        # opc_client.disconnect()
     
     # Error handling
     except Exception as exc:

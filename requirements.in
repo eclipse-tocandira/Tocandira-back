@@ -8,5 +8,4 @@ python-multipart
 pyyaml
 fsspec>=2021.4
 paramiko
-opcua
 git+https://github.com/Aimirim-STI/pyfboot@v0.2.0
